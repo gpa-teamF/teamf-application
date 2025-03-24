@@ -1,36 +1,36 @@
-import React, { useState } from "react";
-import "./App.css";
+import React, { useState } from 'react';
+import './App.css';
 
 function App() {
   const [problem, ] = useState<string>("1 + 1 = ?"); // 問題文
-  const [answer, setAnswer] = useState<string>(""); // 回答
-  const [result, setResult] = useState<string>(""); // 結果
+  const [answer, setAnswer] = useState<string>(''); // 回答
+  const [result, setResult] = useState<string>(''); // 結果
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     // ここにAPI Gateway経由でLambda関数を呼び出す処理を記述します
     // (後ほど実装)
-    setResult("送信中..."); // 送信中の表示
+    setResult('送信中...'); // 送信中の表示
     try {
-      const response = await fetch(
-        "https://ph7mkpj94l.execute-api.ap-northeast-1.amazonaws.com/dev",
-        {
-          // API Gatewayのエンドポイントを設定
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ answer: answer }),
-        }
-      );
+      const response = await fetch(process.env.REACT_APP_API_ENDPOINT || '', { // API Gatewayのエンドポイントを設定
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ answer: answer }),
+      });
 
-      const data: { result: string } = await response.json();
-      setResult(data.result); // Lambda関数からの結果を表示
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data: { result: boolean } = await response.json();
+      setResult(data.result ? '正解！' : '不正解...'); // Lambda関数からの結果を表示
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setResult("エラーが発生しました: " + error.message);
+        setResult('エラーが発生しました: ' + error.message);
       } else {
-        setResult("不明なエラーが発生しました");
+        setResult('不明なエラーが発生しました');
       }
     }
   };
