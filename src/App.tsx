@@ -5,6 +5,7 @@ function App() {
   const [problem, ] = useState<string>("1 + 1 = ?"); // 問題文
   const [answer, setAnswer] = useState<string>(''); // 回答
   const [result, setResult] = useState<string>(''); // 結果
+  const [, setApiData] = useState<unknown>(null); // APIからのレスポンス全体
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -27,7 +28,9 @@ function App() {
       }
 
       const data: { result: boolean } = await response.json();
-      setResult(data.result ? '正解！' : '不正解...'); // Lambda関数からの結果を表示
+      setApiData(data); // APIからのレスポンス全体をセット
+      setResult(`API Response: ${JSON.stringify(data)}`); // レスポンス全体を文字列として表示
+      // setResult(data.result ? '正解！' : '不正解...'); // Lambda関数からの結果を表示
     } catch (error: unknown) {
       if (error instanceof Error) {
         setResult('エラーが発生しました: ' + error.message);
