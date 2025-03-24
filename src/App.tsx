@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import './App.css';
 
+interface ApiResponse {
+  statusCode: number;
+  body: { result: boolean };
+  headers: { [key: string]: string };
+}
+
 function App() {
   const [problem, setProblem] = useState<string>("1 + 1 = ?"); // 問題文
   const [answer, setAnswer] = useState<string>(''); // 回答
@@ -26,9 +32,8 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      const body = JSON.parse(data.body);
-      const result = body.result;
+      const data: ApiResponse = await response.json();
+      const result = data.body.result; // bodyからresultを抽出
       setProblem(`result: ${JSON.stringify(result)}`);
       setResult(result ? '正解！' : '不正解...'); // Lambda関数からの結果を表示
     } catch (error: unknown) {
