@@ -12,7 +12,9 @@ function App() {
     // (後ほど実装)
     setResult('送信中...'); // 送信中の表示
     try {
-      const response = await fetch(process.env.REACT_APP_API_ENDPOINT || '', { // API Gatewayのエンドポイントを設定
+      const response = await fetch(
+        // process.env.REACT_APP_API_ENDPOINT || '', { // API Gatewayのエンドポイントを設定
+        "https://ph7mkpj94l.execute-api.ap-northeast-1.amazonaws.com/dev", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
