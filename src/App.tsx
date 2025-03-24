@@ -26,10 +26,11 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: { result: boolean } = await response.json();
-      setProblem(`result: ${JSON.stringify(data.result)}`);
-      setResult(`API Response: ${JSON.stringify(data)}`); // レスポンス全体を文字列として表示
-      // setResult(data.result ? '正解！' : '不正解...'); // Lambda関数からの結果を表示
+      const data = await response.json();
+      const body = JSON.parse(data.body);
+      const result = body.result;
+      setProblem(`result: ${JSON.stringify(result)}`);
+      setResult(result ? '正解！' : '不正解...'); // Lambda関数からの結果を表示
     } catch (error: unknown) {
       if (error instanceof Error) {
         setResult('エラーが発生しました: ' + error.message);
