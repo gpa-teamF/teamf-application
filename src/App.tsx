@@ -7,7 +7,7 @@ function App() {
   const [problem, ] = useState<string>("1 + 1 = ?"); // 問題文
   const [answer, setAnswer] = useState<string>(''); // 回答
   const [result, setResult] = useState<string>(''); // 結果
-  console.log(process.env.VITE_API_BASE_URL)
+  console.log(import.meta.env.VITE_API_BASE_URL)
 
   // 回答の提出
   const handleSubmit = async (event: React.FormEvent) => {
