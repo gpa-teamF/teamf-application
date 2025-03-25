@@ -16,6 +16,8 @@ function App() {
     try {
       const response = await judgeAnswer(answer);
       setResult(response.data.result ? '正解！' : '不正解...');
+      console.log("response:", response);
+      console.log("response.data:", response.data);
       console.log("Status Code:", response.status);
       console.log("Headers:", response.headers);
     } catch (error: unknown) {
