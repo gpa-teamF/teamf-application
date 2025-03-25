@@ -7,7 +7,6 @@ function App() {
   const [problem, ] = useState<string>("1 + 1 = ?"); // 問題文
   const [answer, setAnswer] = useState<string>(''); // 回答
   const [result, setResult] = useState<string>(''); // 結果
-  console.log(import.meta.env.VITE_API_BASE_URL)
 
   // 回答の提出
   const handleSubmit = async (event: React.FormEvent) => {
@@ -16,10 +15,6 @@ function App() {
     try {
       const response = await judgeAnswer(answer);
       setResult(response.data.result ? '正解！' : '不正解...');
-      console.log("response:", response);
-      console.log("response.data:", response.data);
-      console.log("Status Code:", response.status);
-      console.log("Headers:", response.headers);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         setResult('エラーが発生しました: ' + error.message);
