@@ -32,7 +32,7 @@ function App() {
 
   useEffect(() => {
     if (problemData) {
-      setProblemText(problemData.body.problemId);
+      setProblemText(problemData.body.problemText);
       setProblemId(problemData.body.problemId);
     }
   }, [problemData]);
