@@ -1,7 +1,7 @@
 import { ApiResponse } from "./apiResponse";
 
-export interface JudgeAnswerResponseBody {
+export interface judgeAnswerResponseBody {
   result: boolean;
 }
 
-export type JudgeAnswerResponse = ApiResponse<JudgeAnswerResponseBody>;
+export type judgeAnswerResponse = ApiResponse<judgeAnswerResponseBody>;

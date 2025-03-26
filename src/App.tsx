@@ -1,51 +1,82 @@
-import React, { useState } from 'react';
-import './App.css';
-import { judgeAnswer } from './api/judgeAnswer';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import "./App.css";
+import Problem from "./components/pages/Problem";
+import AnswerForm from "./components/pages/AnswerForm";
+import Layout from "./components/layout/Layout";
+import useApi from "./hooks/useApi";
+import { getProblemResponseBody } from "./models/getProblemResponse";
+import { judgeAnswerResponseBody } from "./models/judgeAnswerResponse";
 
 function App() {
-  const [problem, ] = useState<string>("1 + 1 = ?"); // 問題文
-  const [answer, setAnswer] = useState<string>(''); // 回答
-  const [result, setResult] = useState<string>(''); // 結果
-  const [message, setMessage] = useState<string | undefined>(undefined); // メッセージ
+  const [problemText, setProblemText] = useState<string>("");
+  const [problemId, setProblemId] = useState<string>("");
+  const [result, setResult] = useState<string>("");
+  const [message, setMessage] = useState<string | undefined>(undefined);
 
-  // 回答の提出
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setResult('送信中...');
-    setMessage(undefined); // メッセージをクリア
-    try {
-      const response = await judgeAnswer(answer);
-      setResult(response.data.body.result ? '正解！' : '不正解...');
-      setMessage(response.data.message); // メッセージを設定
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        setMessage('エラーが発生しました: ' + error.message);
-      } else {
-        setMessage('不明なエラーが発生しました');
-      }
-      setResult(''); // 結果をクリア
+  const {
+    data: problemData,
+    error: problemError,
+    loading: problemLoading,
+    fetchData: fetchProblem,
+  } = useApi<getProblemResponseBody>();
+  const {
+    data: answerData,
+    error: answerError,
+    loading: answerLoading,
+    fetchData: fetchAnswer,
+  } = useApi<judgeAnswerResponseBody>();
+
+  useEffect(() => {
+    fetchProblem("/problem", "get");
+  }, [fetchProblem]);
+
+  useEffect(() => {
+    if (problemData) {
+      setProblemText(problemData.body.problemId);
+      setProblemId(problemData.body.problemId);
     }
+  }, [problemData]);
+
+  const handleAnswerSubmit = async (answer: string) => {
+    setResult("Submitting...");
+    setMessage(undefined);
+
+    await fetchAnswer("/answer", "post", {
+      data: {
+        answer: answer,
+        problemId: problemId,
+      },
+    });
   };
 
+  useEffect(() => {
+    if (answerData) {
+      setResult(answerData.body.result ? "Correct!" : "Incorrect...");
+      setMessage(answerData.message);
+    }
+  }, [answerData]);
+
+  useEffect(() => {
+    if (answerError) {
+      setMessage(answerError);
+    }
+  }, [answerError]);
+
   return (
-    <div className="App">
-      <h1>社内競プロアプリ</h1>
-      <p>問題: {problem}</p>
-      <form onSubmit={handleSubmit}>
-        <label>
-          回答:
-          <input
-            type="text"
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-          />
-        </label>
-        <button type="submit">送信</button>
-      </form>
-      <p>結果: {result}</p>
-      {message && <p>Message: {message}</p>} {/* メッセージを表示 */}
-    </div>
+    <Layout>
+      {problemLoading ? (
+        <p>Loading problem...</p>
+      ) : problemError ? (
+        <p>Error: {problemError}</p>
+      ) : (
+        <>
+          <Problem problemText={problemText} />
+          <AnswerForm onSubmit={handleAnswerSubmit} loading={answerLoading} />
+          <p>Result: {result}</p>
+          {message && <p>Message: {message}</p>}
+        </>
+      )}
+    </Layout>
   );
 }
 
