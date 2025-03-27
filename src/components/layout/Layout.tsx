@@ -1,4 +1,5 @@
 import React from "react";
+import Header from "../common/Header"; // Header コンポーネントをインポート
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -7,8 +8,8 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="App">
-      <h1>社内競プロアプリ</h1>
-      {children}
+      <Header /> {/* Header コンポーネントを表示 */}
+      <main>{children}</main>
     </div>
   );
 };
