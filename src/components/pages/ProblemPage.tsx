@@ -16,16 +16,14 @@ const ProblemPage: React.FC = () => {
   const {
     data: problemData,
     error: problemError,
-    // loading: problemLoading,
+    loading: problemLoading,
     fetchData: fetchProblem,
-    showLoading: showProblemLoading,
   } = useApi<getProblemResponseBody>();
   const {
     data: answerData,
     error: answerError,
     loading: answerLoading,
     fetchData: fetchAnswer,
-    showLoading: showAnswerLoading,
   } = useApi<judgeAnswerResponseBody>();
 
   React.useEffect(() => {
@@ -66,10 +64,8 @@ const ProblemPage: React.FC = () => {
 
   return (
     <Layout>
-      <OverlayLoading
-        isLoading={showProblemLoading || showAnswerLoading}
-        color="#5bc0de"
-      />{" "}
+      <OverlayLoading isLoading={problemLoading || answerLoading} size={100} />{" "}
+      {/* loading を使用 */}
       {problemError ? (
         <p>Error: {problemError}</p>
       ) : (

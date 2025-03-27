@@ -1,0 +1,121 @@
+.spinner-dot {
+  animation: brightness 0.8s linear infinite;
+}
+
+@keyframes brightness {
+  0% {
+    fill: #646cff;
+    opacity: 1;
+  }
+  6.25% {
+    fill: #5a62f0;
+    opacity: 0.9;
+  }
+  12.5% {
+    fill: #5058e1;
+    opacity: 0.85;
+  }
+  18.75% {
+    fill: #464ed2;
+    opacity: 0.6;
+  }
+  25% {
+    fill: #3c44c3;
+    opacity: 0.5;
+  }
+  31.25% {
+    fill: #323ab4;
+    opacity: 0.4;
+  }
+  37.5% {
+    fill: #2830a5;
+    opacity: 0.3;
+  }
+  43.75% {
+    fill: #1e2696;
+    opacity: 0.25;
+  }
+  50%,
+  100% {
+    fill: transparent;
+    opacity: 0;
+  }
+  56.25% {
+    fill: transparent;
+    opacity: 0;
+  }
+  62.5% {
+    fill: transparent;
+    opacity: 0;
+  }
+  68.75% {
+    fill: transparent;
+    opacity: 0;
+  }
+  75% {
+    fill: transparent;
+    opacity: 0;
+  }
+  81.25% {
+    fill: transparent;
+    opacity: 0;
+  }
+  87.5% {
+    fill: transparent;
+    opacity: 0;
+  }
+  93.75% {
+    fill: transparent;
+    opacity: 0;
+  }
+}
+
+/* アニメーションの遅延時間を設定 */
+.dot-1 {
+  animation-delay: -0.25s;
+}
+.dot-2 {
+  animation-delay: -0.2s;
+}
+.dot-3 {
+  animation-delay: -0.15s;
+}
+.dot-4 {
+  animation-delay: -0.1s;
+}
+.dot-5 {
+  animation-delay: -0.05s;
+}
+.dot-6 {
+  animation-delay: 0s;
+}
+.dot-7 {
+  animation-delay: -0.75s;
+}
+.dot-8 {
+  animation-delay: -0.7s;
+}
+.dot-9 {
+  animation-delay: -0.65s;
+}
+.dot-10 {
+  animation-delay: -0.6s;
+}
+.dot-11 {
+  animation-delay: -0.55s;
+}
+.dot-12 {
+  animation-delay: -0.5s;
+}
+.dot-13 {
+  animation-delay: -0.45s;
+}
+.dot-14 {
+  animation-delay: -0.4s;
+}
+.dot-15 {
+  animation-delay: -0.35s;
+}
+.dot-16 {
+  animation-delay: -0.3s;
+}

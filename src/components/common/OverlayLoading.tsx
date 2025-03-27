@@ -4,35 +4,33 @@ import "./OverlayLoading.css";
 
 interface OverlayLoadingProps {
   isLoading: boolean;
-  color?: string;
+  size?: number;
 }
 
 const OverlayLoading: React.FC<OverlayLoadingProps> = ({
   isLoading,
-  color,
+  size = 100,
 }) => {
   const [showOverlay, setShowOverlay] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | undefined>(undefined); // useRef を使用
+  const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
     if (isLoading) {
-      // ローディング開始時に表示 (300ms 後)
       timerRef.current = setTimeout(() => {
         setShowOverlay(true);
-      }, 300);
+      }, 10);
     } else {
-      // ローディング終了時に、最小表示時間後に非表示にする
       if (timerRef.current) {
-        clearTimeout(timerRef.current); // 既存のタイマーをクリア
+        clearTimeout(timerRef.current);
       }
       timerRef.current = setTimeout(() => {
         setShowOverlay(false);
-      }, 300); // 最小表示時間 (300ms)
+      }, 5000);
     }
 
     return () => {
       if (timerRef.current) {
-        clearTimeout(timerRef.current); // クリーンアップ
+        clearTimeout(timerRef.current);
       }
     };
   }, [isLoading]);
@@ -42,7 +40,7 @@ const OverlayLoading: React.FC<OverlayLoadingProps> = ({
       {showOverlay && (
         <div className="overlay">
           <div className="overlay-content">
-            <SixDotsRotate color={color} width={100} height={100} />
+            <SixDotsRotate size={size} />
             {/* <p>Loading...</p> */}
           </div>
         </div>
