@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import axios, { Method, AxiosRequestConfig } from "axios";
 import { ApiResponse } from "../models/apiResponse";
-import apiClient from "../api/apiClient"; // apiClient をインポート
+import apiClient from "../api/apiClient";
 import { ApiState } from "../models/apiState";
 
 const useApi = <T>(initialData: ApiResponse<T> | null = null): ApiState<T> => {

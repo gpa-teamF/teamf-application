@@ -18,14 +18,14 @@ const OverlayLoading: React.FC<OverlayLoadingProps> = ({
     if (isLoading) {
       timerRef.current = setTimeout(() => {
         setShowOverlay(true);
-      }, 10);
+      }, 300);
     } else {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
       timerRef.current = setTimeout(() => {
         setShowOverlay(false);
-      }, 5000);
+      }, 300);
     }
 
     return () => {
