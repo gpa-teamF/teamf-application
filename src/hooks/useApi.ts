@@ -2,17 +2,7 @@ import { useState, useCallback } from "react";
 import axios, { Method, AxiosRequestConfig } from "axios";
 import { ApiResponse } from "../models/apiResponse";
 import apiClient from "../api/apiClient"; // apiClient をインポート
-
-interface ApiState<T> {
-  data: ApiResponse<T> | null;
-  error: string | null;
-  loading: boolean;
-  fetchData: (
-    url: string,
-    method: Method,
-    config?: AxiosRequestConfig
-  ) => Promise<void>;
-}
+import { ApiState } from "../models/apiState";
 
 const useApi = <T>(initialData: ApiResponse<T> | null = null): ApiState<T> => {
   const [data, setData] = useState<ApiResponse<T> | null>(initialData);
@@ -37,7 +27,10 @@ const useApi = <T>(initialData: ApiResponse<T> | null = null): ApiState<T> => {
         setData(response.data);
       } catch (e: unknown) {
         if (axios.isAxiosError(e)) {
-          setError(e.message);
+          setError(
+            `Error: ${e.message} (Status: ${e.response?.status || "N/A"})`
+          );
+          console.error("API Error:", e.response?.data); // ログ出力
         } else {
           setError("An unexpected error occurred");
         }
