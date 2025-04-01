@@ -1,0 +1,45 @@
+.problem-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.problem-content section {
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
+  padding: 1.5rem;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.problem-description p,
+.problem-input p,
+.problem-output p {
+  line-height: 1.6;
+}
+
+.problem-constraints ul {
+  list-style-type: disc;
+  margin-left: 2rem;
+}
+
+.problem-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.example-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.example-code {
+  background-color: #444;
+  color: #ddd;
+  padding: 0.75rem;
+  border-radius: 5px;
+  font-family: monospace;
+  white-space: pre-wrap;
+}

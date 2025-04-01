@@ -1,20 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import Problem from "../features/problem/Problem";
 import AnswerForm from "../features/problem/AnswerForm";
 import Layout from "../layout/Layout";
 import useApi from "../../hooks/useApi";
 import { getProblemResponseBody } from "../../models/getProblemResponse";
 import { judgeAnswerResponseBody } from "../../models/judgeAnswerResponse";
-import OverlayLoading from "../common/OverlayLoading"; // OverlayLoading コンポーネントをインポート
+import OverlayLoading from "../common/OverlayLoading";
+import "./ProblemPage.css";
+import ProblemHeader from "../features/problem/ProblemHeader"; // ProblemHeaderコンポーネントをインポート
 
 const ProblemPage: React.FC = () => {
-  const [problemText, setProblemText] = React.useState<string>("");
-  const [problemId, setProblemId] = React.useState<string>("");
-  const [result, setResult] = React.useState<string>("");
-  const [message, setMessage] = React.useState<string | undefined>(undefined);
+  const [problemData, setProblemData] = useState<getProblemResponseBody | null>(
+    null
+  );
+  const [result, setResult] = useState<string>("");
+  const [message, setMessage] = useState<string | undefined>(undefined);
+
+  const [language] = useState<string>("javascript"); // 追加: 言語の状態
 
   const {
-    data: problemData,
+    data: problemDataResponse,
     error: problemError,
     loading: problemLoading,
     fetchData: fetchProblem,
@@ -31,27 +36,28 @@ const ProblemPage: React.FC = () => {
   }, [fetchProblem]);
 
   React.useEffect(() => {
-    if (problemData) {
-      setProblemText(problemData.body.problemText);
-      setProblemId(problemData.body.problemId);
+    if (problemDataResponse) {
+      setProblemData(problemDataResponse.body);
     }
-  }, [problemData]);
+  }, [problemDataResponse]);
 
   const handleAnswerSubmit = async (answer: string) => {
-    setResult("Submitting...");
+    setResult("提出中...");
     setMessage(undefined);
 
-    await fetchAnswer("/answer", "post", {
-      data: {
-        answer: answer,
-        problemId: problemId,
-      },
-    });
+    if (problemData) {
+      await fetchAnswer("/answer", "post", {
+        data: {
+          answer: answer,
+          problemId: problemData.problemId,
+        },
+      });
+    }
   };
 
   React.useEffect(() => {
     if (answerData) {
-      setResult(answerData.body.result ? "Correct!" : "Incorrect...");
+      setResult(answerData.body.result ? "正解!" : "不正解...");
       setMessage(answerData.message);
     }
   }, [answerData]);
@@ -64,14 +70,29 @@ const ProblemPage: React.FC = () => {
 
   return (
     <Layout>
-      <OverlayLoading isLoading={problemLoading || answerLoading} size={100} />{" "}
-      {/* loading を使用 */}
+      <OverlayLoading isLoading={problemLoading || answerLoading} size={100} />
+      <ProblemHeader />
       {problemError ? (
         <p>Error: {problemError}</p>
       ) : (
         <>
-          <Problem problemText={problemText} />
-          <AnswerForm onSubmit={handleAnswerSubmit} loading={answerLoading} />
+          {problemData && (
+            <Problem
+              problemName={problemData.problemName}
+              problemText={problemData.problemText}
+              constraints={problemData.constraints}
+              inputFormat={problemData.inputFormat}
+              outputFormat={problemData.outputFormat}
+              inputExamples={problemData.inputExamples}
+              outputExamples={problemData.outputExamples}
+            />
+          )}
+          <AnswerForm
+            onSubmit={handleAnswerSubmit}
+            loading={answerLoading}
+            language={language}
+          />{" "}
+          {/* 修正箇所 */}
           <p>Result: {result}</p>
           {message && <p>Message: {message}</p>}
         </>

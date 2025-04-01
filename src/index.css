@@ -1,4 +1,10 @@
 :root {
+  --primary-background-color: #242424; /* ダークグレー */
+  --primary-text-color: rgba(255, 255, 255, 0.87); /* ホワイト */
+  --secondary-background-color: #333; /* より濃いグレー */
+  --secondary-text-color: #ddd; /* 薄いグレー */
+  --accent-color: #646cff; /* アクセントカラー */
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -24,10 +30,12 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* display: flex; */
+  /* place-items: center; */
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--primary-background-color);
+  color: var(--primary-text-color);
 }
 
 h1 {

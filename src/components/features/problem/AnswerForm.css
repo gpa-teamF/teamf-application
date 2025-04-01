@@ -1,0 +1,25 @@
+.CodeMirror {
+  border: 1px solid #777;
+  height: 200px;
+  border-radius: 5px;
+  background-color: #444;
+  color: #ddd;
+}
+
+.CodeMirror-scroll {
+  overflow: auto !important; /* スクロールバーを表示 */
+}
+
+.CodeMirror-linenumber {
+  color: #777; /* 行番号の色 */
+}
+
+.CodeMirror-gutters {
+  background-color: #444; /* 行番号の背景色 */
+  border-right: none; /* 行番号の右側のボーダーを削除 */
+}
+
+.cm-content {
+  font-family: monospace; /* 等幅フォント */
+  font-size: 14px;
+}
