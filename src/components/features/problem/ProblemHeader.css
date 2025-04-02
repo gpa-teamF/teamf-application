@@ -1,12 +1,20 @@
 .problem-header {
-  background-color: var(--secondary-background-color);
+  background-color: rgba(100,108,255,0.5);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   color: var(--primary-text-color);
   padding: 1rem;
+  margin: 0 -100rem 2rem;
+  position: sticky;
+  top: 11vh;
+  /*background-color: #282a36;*/
+}
+
+.problem-nav{
+  width: 800px;
+  margin: 0 auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
-  margin: 2rem 0;
-  border-radius: 5px;
 }
 
 .problem-nav a {

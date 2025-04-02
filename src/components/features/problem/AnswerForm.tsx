@@ -74,7 +74,7 @@ const AnswerForm: React.FC<AnswerFormProps> = ({
   });
 
   return (
-    <section className="problem-submission">
+    <section className="problem-submission" id ="submit">
       <h2>提出</h2>
       <form onSubmit={handleSubmit}>
         <select>

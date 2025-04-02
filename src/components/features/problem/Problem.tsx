@@ -21,8 +21,8 @@ const Problem: React.FC<ProblemProps> = ({
   outputExamples,
 }) => {
   return (
-    <main className="problem-content">
-      <section className="problem-description">
+    <main className="problem-content" id ="problem">
+      <section className="problem-description" >
         <h2>{problemName}</h2>
       </section>
       <section className="problem-description">
