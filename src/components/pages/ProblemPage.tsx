@@ -93,7 +93,9 @@ const ProblemPage: React.FC = () => {
             language={language}
           />{" "}
           {/* 修正箇所 */}
-          <p>Result: {result}</p>
+          <div id = "result">
+            <p>Result: {result}</p>
+          </div>
           {message && <p>Message: {message}</p>}
         </>
       )}

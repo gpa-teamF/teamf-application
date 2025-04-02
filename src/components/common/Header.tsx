@@ -1,11 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "./Header.css";
 
 const Header: React.FC = () => {
   return (
-    <header>
+    <header className="header">
       <Link to="/">
-        <h1>社内競プロアプリ</h1>
+        <div className="header-container">
+          <img src="src/assets/logo.png" alt="Logo" className="logo-img"/>
+          <h1 className="apl-ttl">社内競プロアプリ</h1>
+        </div>
       </Link>
     </header>
   );

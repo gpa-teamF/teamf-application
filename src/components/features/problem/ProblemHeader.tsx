@@ -5,10 +5,10 @@ const ProblemHeader: React.FC = () => {
   return (
     <header className="problem-header">
       <nav className="problem-nav">
-        <a href="#">トップ</a>
+        <a href="/">トップ</a>
         <a href="#">問題</a>
-        <a href="#">提出</a>
-        <a href="#">提出結果</a>
+        <a href="#submit">提出</a>
+        <a href="#result">提出結果</a>
         <a href="#">順位</a>
       </nav>
     </header>
