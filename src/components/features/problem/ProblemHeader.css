@@ -1,15 +1,16 @@
 .problem-header {
-  background-color: rgba(100,108,255,0.5);
+  background-color: rgba(100, 108, 255, 0.5);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   color: var(--primary-text-color);
   padding: 1rem;
-  margin: 0 -100rem 2rem;
-  position: sticky;
-  top: 11vh;
+  margin: 0;
+  position: fixed;
+  width: 100%;
+  left: 0;
   /*background-color: #282a36;*/
 }
 
-.problem-nav{
+.problem-nav {
   width: 800px;
   margin: 0 auto;
   display: flex;

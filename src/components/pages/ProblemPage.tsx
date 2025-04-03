@@ -15,7 +15,7 @@ const ProblemPage: React.FC = () => {
   );
   const [result, setResult] = useState<string>("");
   const [message, setMessage] = useState<string | undefined>(undefined);
-
+  const [showResult, setShowResult] = useState<boolean>(false); // 追加：結果表示の状態
   const [language] = useState<string>("javascript"); // 追加: 言語の状態
 
   const {
@@ -42,6 +42,7 @@ const ProblemPage: React.FC = () => {
   }, [problemDataResponse]);
 
   const handleAnswerSubmit = async (answer: string) => {
+    setShowResult(true); // submit時に結果表示をtrueにする
     setResult("提出中...");
     setMessage(undefined);
 
@@ -68,6 +69,13 @@ const ProblemPage: React.FC = () => {
     }
   }, [answerError]);
 
+  const resultClass =
+    result === "正解!"
+      ? "result correct"
+      : result === "不正解..."
+      ? "result incorrect"
+      : "result";
+
   return (
     <Layout>
       <OverlayLoading isLoading={problemLoading || answerLoading} size={100} />
@@ -93,10 +101,12 @@ const ProblemPage: React.FC = () => {
             language={language}
           />{" "}
           {/* 修正箇所 */}
-          <div id = "result">
-            <p>Result: {result}</p>
-          </div>
-          {message && <p>Message: {message}</p>}
+          {showResult && (
+            <section id="result" className={resultClass}>
+              <h2> {result}</h2>
+              {message && <p>Message: {message}</p>}
+            </section>
+          )}
         </>
       )}
     </Layout>

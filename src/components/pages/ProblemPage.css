@@ -39,3 +39,20 @@
   align-self: flex-start;
 }
 
+.result {
+  text-align: center;
+  background-color: #333;
+  color: #ffffff;
+  padding: 0.5rem;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  margin-top: 2rem;
+}
+
+.result.correct {
+  background-color: rgba(125, 206, 125, 0.788);
+}
+
+.result.incorrect {
+  background-color: rgba(231, 95, 90, 0.856);
+}
