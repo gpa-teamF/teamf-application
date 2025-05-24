@@ -1,24 +1,28 @@
 import React, { useState, useCallback, useRef } from "react";
 import { EditorView, keymap } from "@codemirror/view";
 import { defaultKeymap, historyKeymap } from "@codemirror/commands";
-import { javascript } from "@codemirror/lang-javascript";
+import { python } from "@codemirror/lang-python";
+import { java } from "@codemirror/lang-java";
+import { cpp } from "@codemirror/lang-cpp";
 import { basicSetup } from "codemirror";
 import { useCodeMirror } from "@uiw/react-codemirror";
 // import { oneDark } from "@codemirror/theme-one-dark"; // OneDarkテーマ
 import { dracula } from "@uiw/codemirror-theme-dracula"; // Draculaテーマ
 import { LanguageSupport } from "@codemirror/language";
-import "./AnswerForm.css"; // 追加
+import "./AnswerForm.css";
 
 interface AnswerFormProps {
   onSubmit: (answer: string) => void;
   loading: boolean;
   language: string;
+  onLanguageChange: (language: string) => void;
 }
 
 const AnswerForm: React.FC<AnswerFormProps> = ({
   onSubmit,
   loading,
   language,
+  onLanguageChange,
 }) => {
   const [code, setCode] = useState("");
   const editor = useRef<EditorView | null>(null);
@@ -30,22 +34,25 @@ const AnswerForm: React.FC<AnswerFormProps> = ({
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     onSubmit(code);
-    setCode(""); // 入力フィールドをクリア
-    if (editor.current) {
-      editor.current.dispatch({
-        changes: { from: 0, to: editor.current.state.doc.length, insert: "" },
-      });
-    }
+    // setCode(""); // 入力フィールドをクリア
+    // if (editor.current) {
+    //   editor.current.dispatch({
+    //     changes: { from: 0, to: editor.current.state.doc.length, insert: "" },
+    //   });
+    // }
   };
 
   // 言語モードを動的に選択
   const getLanguageMode = (): LanguageSupport | undefined => {
     switch (language) {
-      case "javascript":
-        return javascript();
-      // 他の言語のケースを追加
+      case "python":
+        return python();
+      case "java":
+        return java();
+      case "cpp":
+        return cpp();
       default:
-        return undefined; // またはデフォルトの言語モード
+        return undefined;
     }
   };
 
@@ -74,11 +81,16 @@ const AnswerForm: React.FC<AnswerFormProps> = ({
   });
 
   return (
-    <section className="problem-submission" id ="submit">
+    <section className="problem-submission" id="submit">
       <h2>提出</h2>
       <form onSubmit={handleSubmit}>
-        <select>
-          <option>{language}</option>
+        <select
+          value={language}
+          onChange={(e) => onLanguageChange(e.target.value)}
+        >
+          <option value="python">Python (Python 3.12)</option>
+          <option value="java">Java (OpenJDK 17)</option>
+          <option value="cpp">C++</option>
         </select>
         <div ref={setContainer} /> {/* CodeMirrorを表示するコンテナ */}
         <button type="submit" disabled={loading}>

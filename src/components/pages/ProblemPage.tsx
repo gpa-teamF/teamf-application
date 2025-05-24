@@ -7,7 +7,7 @@ import { getProblemResponseBody } from "../../models/getProblemResponse";
 import { judgeAnswerResponseBody } from "../../models/judgeAnswerResponse";
 import OverlayLoading from "../common/OverlayLoading";
 import "./ProblemPage.css";
-import ProblemHeader from "../features/problem/ProblemHeader"; // ProblemHeaderコンポーネントをインポート
+import ProblemHeader from "../features/problem/ProblemHeader";
 
 const ProblemPage: React.FC = () => {
   const [problemData, setProblemData] = useState<getProblemResponseBody | null>(
@@ -15,8 +15,12 @@ const ProblemPage: React.FC = () => {
   );
   const [result, setResult] = useState<string>("");
   const [message, setMessage] = useState<string | undefined>(undefined);
-  const [showResult, setShowResult] = useState<boolean>(false); // 追加：結果表示の状態
-  const [language] = useState<string>("javascript"); // 追加: 言語の状態
+  const [showResult, setShowResult] = useState<boolean>(false);
+  const [language, setLanguage] = useState<string>("python");
+
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+  };
 
   const {
     data: problemDataResponse,
@@ -51,6 +55,7 @@ const ProblemPage: React.FC = () => {
         data: {
           answer: answer,
           problemId: problemData.problemId,
+          language: language,
         },
       });
     }
@@ -99,6 +104,7 @@ const ProblemPage: React.FC = () => {
             onSubmit={handleAnswerSubmit}
             loading={answerLoading}
             language={language}
+            onLanguageChange={handleLanguageChange}
           />{" "}
           {/* 修正箇所 */}
           {showResult && (
