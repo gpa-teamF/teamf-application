@@ -7,9 +7,13 @@ import { getProblemResponseBody } from "../../models/getProblemResponse";
 import { judgeAnswerResponseBody } from "../../models/judgeAnswerResponse";
 import OverlayLoading from "../common/OverlayLoading";
 import "./ProblemPage.css";
-import ProblemHeader from "../features/problem/ProblemHeader";
+// import ProblemHeader from "../features/problem/ProblemHeader";
+import { useLocation } from "react-router-dom";
+import CenteredCardLayout from "../layout/CenteredCardLayout";
 
 const ProblemPage: React.FC = () => {
+  const location = useLocation();
+  const { level } = location.state || {};
   const [problemData, setProblemData] = useState<getProblemResponseBody | null>(
     null
   );
@@ -83,38 +87,44 @@ const ProblemPage: React.FC = () => {
 
   return (
     <Layout>
-      <OverlayLoading isLoading={problemLoading || answerLoading} size={100} />
-      <ProblemHeader />
-      {problemError ? (
-        <p>Error: {problemError}</p>
-      ) : (
-        <>
-          {problemData && (
-            <Problem
-              problemName={problemData.problemName}
-              problemText={problemData.problemText}
-              constraints={problemData.constraints}
-              inputFormat={problemData.inputFormat}
-              outputFormat={problemData.outputFormat}
-              inputExamples={problemData.inputExamples}
-              outputExamples={problemData.outputExamples}
-            />
-          )}
-          <AnswerForm
-            onSubmit={handleAnswerSubmit}
-            loading={answerLoading}
-            language={language}
-            onLanguageChange={handleLanguageChange}
-          />{" "}
-          {/* 修正箇所 */}
-          {showResult && (
-            <section id="result" className={resultClass}>
-              <h2> {result}</h2>
-              {message && <p>Message: {message}</p>}
-            </section>
-          )}
-        </>
-      )}
+      <CenteredCardLayout>
+        <OverlayLoading
+          isLoading={problemLoading || answerLoading}
+          size={100}
+        />
+        {/* <ProblemHeader /> */}
+        {/* <h2>選択されたレベル: {level}</h2> */}
+        {problemError ? (
+          <p>Error: {problemError}</p>
+        ) : (
+          <>
+            {problemData && (
+              <Problem
+                problemName={problemData.problemName}
+                problemText={problemData.problemText}
+                constraints={problemData.constraints}
+                inputFormat={problemData.inputFormat}
+                outputFormat={problemData.outputFormat}
+                inputExamples={problemData.inputExamples}
+                outputExamples={problemData.outputExamples}
+              />
+            )}
+            <AnswerForm
+              onSubmit={handleAnswerSubmit}
+              loading={answerLoading}
+              language={language}
+              onLanguageChange={handleLanguageChange}
+            />{" "}
+            {/* 修正箇所 */}
+            {showResult && (
+              <section id="result" className={resultClass}>
+                <h2> {result}</h2>
+                {message && <p>Message: {message}</p>}
+              </section>
+            )}
+          </>
+        )}
+      </CenteredCardLayout>
     </Layout>
   );
 };

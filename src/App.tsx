@@ -3,6 +3,7 @@ import "./App.css";
 import RemoveTrailingSlash from "./components/common/RemoveTrailingSlash";
 import ProblemPage from "./components/pages/ProblemPage";
 import Welcome from "./components/pages/WelcomePage";
+import DifficultySelectPage from "./components/pages/DifficultySelectPage";
 
 function App() {
   return (
@@ -12,6 +13,11 @@ function App() {
         <Route path="/" element={<Welcome />} />{" "}
         {/* ようこそ画面へのルーティング */}
         <Route path="/problem" element={<ProblemPage />} />{" "}
+        {/* 問題画面ページへのルーティング */}
+        <Route
+          path="/difficultySelect"
+          element={<DifficultySelectPage />}
+        />{" "}
         {/* 問題画面ページへのルーティング */}
       </Routes>
     </BrowserRouter>

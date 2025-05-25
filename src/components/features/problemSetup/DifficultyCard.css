@@ -1,0 +1,35 @@
+.difficulty-card {
+  border: 1px solid #555;
+  background-color: #1e1e2f;
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin: 1rem 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #e0e0e0;
+}
+
+.difficulty-card:hover {
+  background-color: #2c2c3a;
+  border-color: #a084e8;
+}
+
+.difficulty-card.selected {
+  border-color: #a084e8;
+  background-color: #3a2e58;
+  color: #e5d9ff;
+  box-shadow: 0 0 10px rgba(160, 132, 232, 0.6);
+}
+
+.difficulty-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #c9b3ff;
+  margin-bottom: 0.5rem;
+}
+
+.difficulty-description {
+  font-size: 0.95rem;
+  color: #ccc;
+  white-space: pre-line;
+}

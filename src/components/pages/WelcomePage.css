@@ -1,0 +1,89 @@
+/* メインタイトル（h2） */
+.welcome-title {
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  border-bottom: 2px solid #9f7aea;
+  padding-bottom: 0.3rem;
+}
+
+/* 注釈 */
+.welcome-note {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+/* はじめに */
+.introduction-box {
+  background-color: #1e1e2f; /* ダーク背景にマッチする色 */
+  border: 1px solid #555;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  color: #e0e0e0;
+  transition: box-shadow 0.3s ease;
+}
+
+.introduction-box:hover {
+  box-shadow: 0 4px 12px rgba(160, 132, 232, 0.3); /* 軽いアクセント */
+}
+
+
+/* サブセクション */
+.welcome-section {
+  margin-bottom: 1.5rem;
+}
+
+/* サブタイトル（h3） */
+.welcome-subtitle {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #9f7aea; /* 明るめの紫 */
+}
+
+/* 本文（インデントあり） */
+.welcome-paragraph {
+  margin-left: 1rem;
+  line-height: 1.6;
+}
+
+/* 箇条書き */
+.welcome-paragraph li {
+  margin-left: 1.2rem;
+  margin-bottom: 0.4rem;
+  list-style-type: disc;
+}
+
+/* リンク */
+.welcome-paragraph a {
+  text-decoration: underline;
+  color: #9f7aea; /* 明るめの紫 */
+}
+
+/* 警告 */
+.danger-text {
+  color: #c0392b;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-decoration: underline;
+}
+
+/* 利用開始ボタン */
+.accept-button {
+  background-color: #915aff;
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 2rem; /* ← 追加 */
+}
+
+.accept-button:hover {
+  background-color: #6d32f6;
+}
