@@ -9,23 +9,27 @@ import CenteredCardLayout from "../layout/CenteredCardLayout";
 
 const difficulties = [
   {
-    level: "初級",
+    level: "easy",
+    name: "初級",
     description:
-      "プログラミング初心者や競技プログラミング未経験者向けの難易度です。",
+      "初級者向け\nプログラミング初心者や競技プログラミング未経験者向けの難易度です。",
   },
   {
-    level: "中級",
+    level: "medium",
+    name: "中級",
     description:
-      "基本的なアルゴリズムやデータ構造にある程度慣れている方向けです。",
+      "中級者向け\n基本的なアルゴリズムやデータ構造にある程度慣れている方向けです。",
   },
   {
-    level: "上級",
-    description: "難解な問題や高度な実装に挑戦したい方向けの難易度です。",
+    level: "hard",
+    name: "上級",
+    description:
+      "上級者向け\n難解な問題や高度な実装に挑戦したい方向けの難易度です。",
   },
 ];
 
 const DifficultySelectPage: React.FC = () => {
-  const [selectedLevel, setSelectedLevel] = useState("初級");
+  const [selectedLevel, setSelectedLevel] = useState("easy");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [onModalOk, setOnModalOk] = useState<() => void>(() => {});
@@ -58,7 +62,7 @@ const DifficultySelectPage: React.FC = () => {
           {difficulties.map((diff) => (
             <DifficultyCard
               key={diff.level}
-              level={diff.level}
+              name={diff.name}
               description={diff.description}
               isSelected={selectedLevel === diff.level}
               onClick={() => setSelectedLevel(diff.level)}

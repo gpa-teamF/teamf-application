@@ -1,37 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Problem from "../features/problem/Problem";
 import AnswerForm from "../features/problem/AnswerForm";
 import Layout from "../layout/Layout";
 import useApi from "../../hooks/useApi";
-import { getProblemResponseBody } from "../../models/getProblemResponse";
+import {
+  getMultipleProblemResponseBody,
+  getProblemResponseBody,
+} from "../../models/getProblemResponse";
 import { judgeAnswerResponseBody } from "../../models/judgeAnswerResponse";
 import OverlayLoading from "../common/OverlayLoading";
-import "./ProblemPage.css";
-// import ProblemHeader from "../features/problem/ProblemHeader";
 import { useLocation } from "react-router-dom";
 import CenteredCardLayout from "../layout/CenteredCardLayout";
+import "./ProblemPage.css";
 
 const ProblemPage: React.FC = () => {
   const location = useLocation();
   const { level } = location.state || {};
-  const [problemData, setProblemData] = useState<getProblemResponseBody | null>(
-    null
-  );
+  const [problems, setProblems] = useState<getProblemResponseBody[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [result, setResult] = useState<string>("");
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [showResult, setShowResult] = useState<boolean>(false);
   const [language, setLanguage] = useState<string>("python");
-
-  const handleLanguageChange = (newLanguage: string) => {
-    setLanguage(newLanguage);
-  };
 
   const {
     data: problemDataResponse,
     error: problemError,
     loading: problemLoading,
     fetchData: fetchProblem,
-  } = useApi<getProblemResponseBody>();
+  } = useApi<getMultipleProblemResponseBody>();
+
   const {
     data: answerData,
     error: answerError,
@@ -39,45 +37,73 @@ const ProblemPage: React.FC = () => {
     fetchData: fetchAnswer,
   } = useApi<judgeAnswerResponseBody>();
 
-  React.useEffect(() => {
-    fetchProblem("/problem", "get");
-  }, [fetchProblem]);
+  useEffect(() => {
+    if (level) {
+      fetchProblem("/problem", "get", {
+        params: {
+          difficulty: level,
+          count: 3,
+        },
+      });
+    }
+  }, [fetchProblem, level]);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    console.log("Fetched problemDataResponse:", problemDataResponse);
     if (problemDataResponse) {
-      setProblemData(problemDataResponse.body);
+      setProblems(problemDataResponse.body);
     }
   }, [problemDataResponse]);
 
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+  };
+
   const handleAnswerSubmit = async (answer: string) => {
-    setShowResult(true); // submit時に結果表示をtrueにする
+    setShowResult(true);
     setResult("提出中...");
     setMessage(undefined);
 
-    if (problemData) {
+    const currentProblem = problems[currentIndex];
+    if (currentProblem) {
       await fetchAnswer("/answer", "post", {
         data: {
           answer: answer,
-          problemId: problemData.problemId,
+          problemId: currentProblem.problemId,
           language: language,
         },
       });
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (answerData) {
       setResult(answerData.body.result ? "正解!" : "不正解...");
       setMessage(answerData.message);
     }
   }, [answerData]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (answerError) {
       setMessage(answerError);
     }
   }, [answerError]);
 
+  const handleNext = () => {
+    setShowResult(false);
+    setResult("");
+    setMessage(undefined);
+    setCurrentIndex((prev) => Math.min(prev + 1, problems.length - 1));
+  };
+
+  const handleSelectIndex = (index: number) => {
+    setShowResult(false);
+    setResult("");
+    setMessage(undefined);
+    setCurrentIndex(index);
+  };
+
+  const currentProblem = problems[currentIndex];
   const resultClass =
     result === "正解!"
       ? "result correct"
@@ -92,35 +118,53 @@ const ProblemPage: React.FC = () => {
           isLoading={problemLoading || answerLoading}
           size={100}
         />
-        {/* <ProblemHeader /> */}
-        {/* <h2>選択されたレベル: {level}</h2> */}
         {problemError ? (
           <p>Error: {problemError}</p>
         ) : (
           <>
-            {problemData && (
-              <Problem
-                problemName={problemData.problemName}
-                problemText={problemData.problemText}
-                constraints={problemData.constraints}
-                inputFormat={problemData.inputFormat}
-                outputFormat={problemData.outputFormat}
-                inputExamples={problemData.inputExamples}
-                outputExamples={problemData.outputExamples}
-              />
-            )}
-            <AnswerForm
-              onSubmit={handleAnswerSubmit}
-              loading={answerLoading}
-              language={language}
-              onLanguageChange={handleLanguageChange}
-            />{" "}
-            {/* 修正箇所 */}
-            {showResult && (
-              <section id="result" className={resultClass}>
-                <h2> {result}</h2>
-                {message && <p>Message: {message}</p>}
-              </section>
+            {currentProblem && (
+              <>
+                <div className="problem-navigation">
+                  {problems.map((_, idx) => (
+                    <button
+                      key={idx}
+                      className={`nav-button ${
+                        idx === currentIndex ? "active" : ""
+                      }`}
+                      onClick={() => handleSelectIndex(idx)}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
+                </div>
+                <Problem
+                  problemName={currentProblem.problemName}
+                  problemText={currentProblem.problemText}
+                  constraints={currentProblem.constraints}
+                  inputFormat={currentProblem.inputFormat}
+                  outputFormat={currentProblem.outputFormat}
+                  inputExamples={currentProblem.inputExamples}
+                  outputExamples={currentProblem.outputExamples}
+                  timeLimit={currentProblem.timeLimit}
+                  memoryLimit={currentProblem.memoryLimit}
+                />
+                <AnswerForm
+                  onSubmit={handleAnswerSubmit}
+                  loading={answerLoading}
+                  language={language}
+                  onLanguageChange={handleLanguageChange}
+                />
+                {showResult && (
+                  <section className={resultClass} id="result">
+                    <h3>提出結果</h3>
+                    <p>{result}</p>
+                    {message && <p>{message}</p>}
+                  </section>
+                )}
+                {currentIndex < problems.length - 1 && (
+                  <button onClick={handleNext}>次の問題へ</button>
+                )}
+              </>
             )}
           </>
         )}

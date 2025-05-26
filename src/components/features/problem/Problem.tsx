@@ -2,13 +2,15 @@ import React from "react";
 import "./Problem.css";
 
 interface ProblemProps {
-  problemName?: string; // オプション
+  problemName: string;
   problemText: string;
-  constraints?: string[]; // オプション
-  inputFormat?: string; // オプション
-  outputFormat?: string; // オプション
-  inputExamples?: string[]; // オプション
-  outputExamples?: string[]; // オプション
+  constraints: string;
+  inputFormat: string;
+  outputFormat: string;
+  inputExamples: string[];
+  outputExamples: string[];
+  timeLimit: string;
+  memoryLimit: string;
 }
 
 const Problem: React.FC<ProblemProps> = ({
@@ -19,12 +21,17 @@ const Problem: React.FC<ProblemProps> = ({
   outputFormat,
   inputExamples,
   outputExamples,
+  timeLimit,
+  memoryLimit,
 }) => {
   return (
-    <main className="problem-content" id ="problem">
-      <section className="problem-description" >
-        <h2>{problemName}</h2>
+    <main className="problem-content" id="problem">
+      <section className="">{timeLimit}</section>
+      <section className="">{memoryLimit}</section>
+      <section className="">
+        <h1>{problemName}</h1>
       </section>
+
       <section className="problem-description">
         <h2>問題文</h2>
         <p>{problemText}</p>
@@ -33,11 +40,7 @@ const Problem: React.FC<ProblemProps> = ({
       {constraints && (
         <section className="problem-constraints">
           <h2>制約</h2>
-          <ul>
-            {constraints.map((constraint, index) => (
-              <li key={index}>{constraint}</li>
-            ))}
-          </ul>
+          <p>{constraints}</p>
         </section>
       )}
 
