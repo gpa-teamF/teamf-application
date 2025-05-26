@@ -6,43 +6,39 @@ import { java } from "@codemirror/lang-java";
 import { cpp } from "@codemirror/lang-cpp";
 import { basicSetup } from "codemirror";
 import { useCodeMirror } from "@uiw/react-codemirror";
-// import { oneDark } from "@codemirror/theme-one-dark"; // OneDarkテーマ
-import { dracula } from "@uiw/codemirror-theme-dracula"; // Draculaテーマ
+import { dracula } from "@uiw/codemirror-theme-dracula";
 import { LanguageSupport } from "@codemirror/language";
 import "./AnswerForm.css";
+import { ExecuteCodeResponse } from "../../../models/executeCodeResponse";
 
 interface AnswerFormProps {
-  onSubmit: (answer: string) => void;
+  onExecute: (code: string, stdin: string) => void;
   loading: boolean;
   language: string;
   onLanguageChange: (language: string) => void;
+  executionResult: ExecuteCodeResponse | null;
 }
 
 const AnswerForm: React.FC<AnswerFormProps> = ({
-  onSubmit,
+  onExecute,
   loading,
   language,
   onLanguageChange,
+  executionResult,
 }) => {
   const [code, setCode] = useState("");
+  const [stdin, setStdin] = useState("");
   const editor = useRef<EditorView | null>(null);
 
   const onChange = useCallback((value: string) => {
     setCode(value);
   }, []);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleExecute = (event: React.FormEvent) => {
     event.preventDefault();
-    onSubmit(code);
-    // setCode(""); // 入力フィールドをクリア
-    // if (editor.current) {
-    //   editor.current.dispatch({
-    //     changes: { from: 0, to: editor.current.state.doc.length, insert: "" },
-    //   });
-    // }
+    onExecute(code, stdin);
   };
 
-  // 言語モードを動的に選択
   const getLanguageMode = (): LanguageSupport | undefined => {
     switch (language) {
       case "python":
@@ -71,8 +67,7 @@ const AnswerForm: React.FC<AnswerFormProps> = ({
   const { setContainer } = useCodeMirror({
     value: code,
     height: "200px",
-    // theme: oneDark, // oneDark
-    theme: dracula, // dracula
+    theme: dracula,
     extensions: extensions,
     onChange,
     onUpdate(v) {
@@ -82,21 +77,89 @@ const AnswerForm: React.FC<AnswerFormProps> = ({
 
   return (
     <section className="problem-submission" id="submit">
-      <h2>提出</h2>
-      <form onSubmit={handleSubmit}>
-        <select
-          value={language}
-          onChange={(e) => onLanguageChange(e.target.value)}
-        >
-          <option value="python">Python (Python 3.12)</option>
-          <option value="java">Java (OpenJDK 17)</option>
-          <option value="cpp">C++</option>
-        </select>
-        <div ref={setContainer} /> {/* CodeMirrorを表示するコンテナ */}
+      <h2>コード実行</h2>
+      <form onSubmit={handleExecute}>
+        <label className="block mb-2">
+          使用言語：
+          <select
+            className="ml-2"
+            value={language}
+            onChange={(e) => onLanguageChange(e.target.value)}
+          >
+            <option value="python">Python (Python 3.12)</option>
+            <option value="java">Java (OpenJDK 17)</option>
+            <option value="cpp">C++</option>
+          </select>
+        </label>
+
+        <div ref={setContainer} className="mb-4" />
+
+        <label className="block mb-4">
+          標準入力（任意）:
+          <textarea
+            className="w-full mt-1 p-2 border rounded"
+            rows={4}
+            value={stdin}
+            onChange={(e) => setStdin(e.target.value)}
+            placeholder="標準入力をここに記入（例：1 2）"
+          />
+        </label>
+
         <button type="submit" disabled={loading}>
-          {loading ? "提出中..." : "提出"}
+          {loading ? "実行中..." : "実行"}
         </button>
       </form>
+
+      {executionResult && (
+        <section className="mt-6 p-4 bg-gray-100 rounded">
+          <h3 className="font-bold mb-2">💡 実行結果</h3>
+
+          <table className="result-table mb-4">
+            <tbody>
+              <tr>
+                <th>終了コード</th>
+                <td>{executionResult.exitCode}</td>
+              </tr>
+              <tr>
+                <th>実行時間</th>
+                <td>
+                  {executionResult.executionTime !== null
+                    ? `${executionResult.executionTime} ms`
+                    : "-"}
+                </td>
+              </tr>
+              <tr>
+                <th>メモリ使用量</th>
+                <td>
+                  {executionResult.memoryUsage !== null
+                    ? `${executionResult.memoryUsage} KB`
+                    : "-"}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className="output-box mb-4">
+            <h4 className="font-semibold">標準出力</h4>
+            <textarea
+              className="output-textarea"
+              readOnly
+              value={executionResult.stdout || ""}
+            />
+          </div>
+
+          {executionResult.stderr && (
+            <div className="output-box">
+              <h4 className="font-semibold text-red-600">標準エラー出力</h4>
+              <textarea
+                className="output-textarea text-red-600"
+                readOnly
+                value={executionResult.stderr}
+              />
+            </div>
+          )}
+        </section>
+      )}
     </section>
   );
 };

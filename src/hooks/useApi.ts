@@ -1,11 +1,10 @@
 import { useState, useCallback } from "react";
 import axios, { Method, AxiosRequestConfig } from "axios";
-import { ApiResponse } from "../models/apiResponse";
 import apiClient from "../api/apiClient";
 import { ApiState } from "../models/apiState";
 
-const useApi = <T>(initialData: ApiResponse<T> | null = null): ApiState<T> => {
-  const [data, setData] = useState<ApiResponse<T> | null>(initialData);
+const useApi = <T>(initialData: T | null = null): ApiState<T> => {
+  const [data, setData] = useState<T | null>(initialData);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -19,7 +18,7 @@ const useApi = <T>(initialData: ApiResponse<T> | null = null): ApiState<T> => {
       setError(null);
 
       try {
-        const response = await apiClient<ApiResponse<T>>({
+        const response = await apiClient<T>({
           url,
           method,
           ...config,

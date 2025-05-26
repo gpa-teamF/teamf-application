@@ -4,14 +4,15 @@ import AnswerForm from "../features/problem/AnswerForm";
 import Layout from "../layout/Layout";
 import useApi from "../../hooks/useApi";
 import {
-  getMultipleProblemResponseBody,
+  getMultipleProblemResponse,
   getProblemResponseBody,
 } from "../../models/getProblemResponse";
-import { judgeAnswerResponseBody } from "../../models/judgeAnswerResponse";
+import { judgeAnswerResponse } from "../../models/judgeAnswerResponse";
 import OverlayLoading from "../common/OverlayLoading";
 import { useLocation } from "react-router-dom";
 import CenteredCardLayout from "../layout/CenteredCardLayout";
 import "./ProblemPage.css";
+import { ExecuteCodeResponse } from "../../models/executeCodeResponse";
 
 const ProblemPage: React.FC = () => {
   const location = useLocation();
@@ -19,23 +20,29 @@ const ProblemPage: React.FC = () => {
   const [problems, setProblems] = useState<getProblemResponseBody[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [result, setResult] = useState<string>("");
-  const [message, setMessage] = useState<string | undefined>(undefined);
   const [showResult, setShowResult] = useState<boolean>(false);
   const [language, setLanguage] = useState<string>("python");
 
   const {
-    data: problemDataResponse,
+    data: problemData,
     error: problemError,
     loading: problemLoading,
     fetchData: fetchProblem,
-  } = useApi<getMultipleProblemResponseBody>();
+  } = useApi<getMultipleProblemResponse>();
+
+  const {
+    data: executionResult,
+    error: executionError,
+    loading: executionLoading,
+    fetchData: fetchExecution,
+  } = useApi<ExecuteCodeResponse>();
 
   const {
     data: answerData,
     error: answerError,
     loading: answerLoading,
     fetchData: fetchAnswer,
-  } = useApi<judgeAnswerResponseBody>();
+  } = useApi<judgeAnswerResponse>();
 
   useEffect(() => {
     if (level) {
@@ -49,57 +56,26 @@ const ProblemPage: React.FC = () => {
   }, [fetchProblem, level]);
 
   useEffect(() => {
-    console.log("Fetched problemDataResponse:", problemDataResponse);
-    if (problemDataResponse) {
-      setProblems(problemDataResponse.body);
+    if (problemData) {
+      setProblems(problemData);
     }
-  }, [problemDataResponse]);
-
-  const handleLanguageChange = (newLanguage: string) => {
-    setLanguage(newLanguage);
-  };
-
-  const handleAnswerSubmit = async (answer: string) => {
-    setShowResult(true);
-    setResult("提出中...");
-    setMessage(undefined);
-
-    const currentProblem = problems[currentIndex];
-    if (currentProblem) {
-      await fetchAnswer("/answer", "post", {
-        data: {
-          answer: answer,
-          problemId: currentProblem.problemId,
-          language: language,
-        },
-      });
-    }
-  };
+  }, [problemData]);
 
   useEffect(() => {
     if (answerData) {
-      setResult(answerData.body.result ? "正解!" : "不正解...");
-      setMessage(answerData.message);
+      setResult(answerData.result ? "正解!" : "不正解...");
     }
   }, [answerData]);
 
-  useEffect(() => {
-    if (answerError) {
-      setMessage(answerError);
-    }
-  }, [answerError]);
-
-  const handleNext = () => {
-    setShowResult(false);
-    setResult("");
-    setMessage(undefined);
-    setCurrentIndex((prev) => Math.min(prev + 1, problems.length - 1));
+  const handleCodeExecute = async (code: string, stdin: string) => {
+    await fetchExecution("/execute", "post", {
+      data: { code, stdin, language },
+    });
   };
 
   const handleSelectIndex = (index: number) => {
     setShowResult(false);
     setResult("");
-    setMessage(undefined);
     setCurrentIndex(index);
   };
 
@@ -148,21 +124,20 @@ const ProblemPage: React.FC = () => {
                   timeLimit={currentProblem.timeLimit}
                   memoryLimit={currentProblem.memoryLimit}
                 />
+
                 <AnswerForm
-                  onSubmit={handleAnswerSubmit}
-                  loading={answerLoading}
+                  onExecute={handleCodeExecute}
                   language={language}
-                  onLanguageChange={handleLanguageChange}
+                  onLanguageChange={setLanguage}
+                  loading={executionLoading}
+                  executionResult={executionResult}
                 />
+
                 {showResult && (
                   <section className={resultClass} id="result">
                     <h3>提出結果</h3>
                     <p>{result}</p>
-                    {message && <p>{message}</p>}
                   </section>
-                )}
-                {currentIndex < problems.length - 1 && (
-                  <button onClick={handleNext}>次の問題へ</button>
                 )}
               </>
             )}
