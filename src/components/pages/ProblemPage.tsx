@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Problem from "../features/problem/Problem";
-import AnswerForm from "../features/problem/AnswerForm";
+import Problem from "../features/problem/ProblemCard";
+import AnswerForm from "../features/problem/CodeExecutionCard";
 import Layout from "../layout/Layout";
 import useApi from "../../hooks/useApi";
 import {
@@ -91,7 +91,7 @@ const ProblemPage: React.FC = () => {
     <Layout>
       <CenteredCardLayout>
         <OverlayLoading
-          isLoading={problemLoading || answerLoading}
+          isLoading={problemLoading || executionLoading || answerLoading}
           size={100}
         />
         {problemError ? (

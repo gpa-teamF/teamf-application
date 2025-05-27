@@ -1,5 +1,5 @@
 import React from "react";
-import "./Problem.css";
+import "./ProblemCard.css";
 
 interface ProblemProps {
   problemName: string;

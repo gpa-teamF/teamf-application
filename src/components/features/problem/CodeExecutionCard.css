@@ -1,0 +1,108 @@
+.code-execution {
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
+  padding: 1.5rem;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  overflow-x: auto; /* ← 横スクロールを許可してレイアウト崩れを防ぐ */
+}
+
+.code-execution__title {
+  line-height: 1;
+}
+
+.code-execution__subtitle {
+  line-height: 1;
+}
+
+.code-execution__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 100%;
+}
+
+.sub-section {
+  padding: 0.5rem;
+  max-width: 100%;
+}
+
+.language-select {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+}
+
+.code-execution__editor {
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  overflow: auto;
+}
+
+.result-table {
+  width: auto;
+  border-collapse: collapse;
+}
+
+.result-table th,
+.result-table td {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.output-box__textarea--error {
+  color: #ff6b6b;
+  background-color: #2a0000;
+}
+
+.result-table__cell--error {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+.code-execution__button {
+  background-color: #915aff;
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.code-execution__button:hover {
+  background-color: #6d32f6;
+}
+
+.code-execution__button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.stdin-box__textarea,
+.output-box__textarea {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: auto;
+  font-family: "Courier New", Courier, monospace;
+  background-color: #1e1e1e;
+  color: #dcdcdc;
+  border: none;
+  padding: 1rem;
+  width: 100%;
+  resize: none;
+  white-space: pre-wrap;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.stdin-box__textarea {
+  resize: none;
+}
+.output-box__textarea {
+  resize: vertical;
+}
