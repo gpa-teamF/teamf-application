@@ -56,3 +56,8 @@
 .result.incorrect {
   background-color: rgba(231, 95, 90, 0.856);
 }
+
+.page-disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}

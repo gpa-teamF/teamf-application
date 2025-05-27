@@ -5,7 +5,7 @@
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
-  overflow-x: auto; /* ← 横スクロールを許可してレイアウト崩れを防ぐ */
+  overflow-x: auto;
 }
 
 .code-execution__title {
@@ -38,6 +38,9 @@
   border: 1px solid #ddd;
   border-radius: 0.5rem;
   overflow: auto;
+  height: 250px;
+  resize: vertical;
+  min-height: 100px;
 }
 
 .result-table {

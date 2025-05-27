@@ -1,45 +1,46 @@
+.problem-container {
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
+  padding: 1.5rem;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+
+.problem-title {
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  border-bottom: 2px solid #9f7aea;
+  padding-bottom: 0.3rem;
+}
+
 .problem-content {
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
-.problem-content section {
-  background-color: var(--secondary-background-color);
-  color: var(--primary-text-color);
-  padding: 1.5rem;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+.sub-section {
+  padding: 0.5rem;
+  max-width: 100%;
 }
 
-.problem-description p,
-.problem-input p,
-.problem-output p {
-  line-height: 1.6;
-}
-
-.problem-constraints ul {
-  list-style-type: disc;
-  margin-left: 2rem;
-}
-
-.problem-examples {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.example-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.problem-subtitle {
+  line-height: 1;
 }
 
 .example-code {
-  background-color: #444;
+  font-family: monospace;
+}
+
+.context, 
+.example-code {
+  /* background-color: #444; */
+  background-color: #252525;
   color: #ddd;
   padding: 0.75rem;
   border-radius: 5px;
-  font-family: monospace;
   white-space: pre-wrap;
 }

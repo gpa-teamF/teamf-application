@@ -1,46 +1,48 @@
-import React, { useState, useCallback, useRef } from "react";
-import { EditorView, keymap } from "@codemirror/view";
-import { defaultKeymap, historyKeymap } from "@codemirror/commands";
+import React from "react";
+import CodeMirror from "@uiw/react-codemirror";
+import { dracula } from "@uiw/codemirror-theme-dracula";
 import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
 import { cpp } from "@codemirror/lang-cpp";
-import { basicSetup } from "codemirror";
-import { useCodeMirror } from "@uiw/react-codemirror";
-import { dracula } from "@uiw/codemirror-theme-dracula";
-import { LanguageSupport } from "@codemirror/language";
 import "./CodeExecutionCard.css";
 import { ExecuteCodeResponse } from "../../../models/executeCodeResponse";
 
-interface CodeExecutionCardProps {
-  onExecute: (code: string, stdin: string) => void;
-  loading: boolean;
+export interface ProblemState {
+  code: string;
+  stdin: string;
   language: string;
-  onLanguageChange: (lang: string) => void;
   executionResult?: ExecuteCodeResponse;
 }
 
+export interface CodeExecutionCardProps {
+  problemIndex: number;
+  onExecute: (code: string, stdin: string, problemIndex: number) => void;
+  loading: boolean;
+  isSubmitting: boolean;
+  onLanguageChange: (lang: string, problemIndex: number) => void;
+  problemStates: ProblemState[];
+  setProblemStates: React.Dispatch<React.SetStateAction<ProblemState[]>>;
+  disabled?: boolean;
+}
+
 const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
+  problemIndex,
   onExecute,
   loading,
-  language,
+  isSubmitting,
   onLanguageChange,
-  executionResult,
+  problemStates,
+  setProblemStates,
+  disabled,
 }) => {
-  const [code, setCode] = useState("");
-  const [stdin, setStdin] = useState("");
-  const editor = useRef<EditorView | null>(null);
-
-  const onChange = useCallback((value: string) => {
-    setCode(value);
-  }, []);
-
-  const handleExecute = (event: React.FormEvent) => {
-    event.preventDefault();
-    onExecute(code, stdin);
+  const currentState = problemStates[problemIndex] || {
+    code: "",
+    stdin: "",
+    language: "python",
   };
 
-  const getLanguageMode = (): LanguageSupport | undefined => {
-    switch (language) {
+  const getLanguageMode = () => {
+    switch (currentState.language) {
       case "python":
         return python();
       case "java":
@@ -48,49 +50,61 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
       case "cpp":
         return cpp();
       default:
-        return undefined;
+        return python();
     }
   };
 
-  const languageMode = getLanguageMode();
+  const handleCodeChange = (value: string) => {
+    const newStates = [...problemStates];
+    newStates[problemIndex] = {
+      ...newStates[problemIndex],
+      code: value,
+    };
+    setProblemStates(newStates);
+  };
 
-  const extensions = [
-    basicSetup,
-    keymap.of([...defaultKeymap, ...historyKeymap]),
-    EditorView.lineWrapping,
-  ];
+  const handleLanguageChange = (lang: string) => {
+    const newStates = [...problemStates];
+    newStates[problemIndex] = {
+      ...newStates[problemIndex],
+      language: lang,
+    };
+    setProblemStates(newStates);
+    onLanguageChange(lang, problemIndex);
+  };
 
-  if (languageMode) {
-    extensions.push(languageMode);
-  }
+  const handleStdinChange = (value: string) => {
+    const newStates = [...problemStates];
+    newStates[problemIndex] = {
+      ...newStates[problemIndex],
+      stdin: value,
+    };
+    setProblemStates(newStates);
+  };
 
-  const { setContainer } = useCodeMirror({
-    value: code,
-    height: "200px",
-    theme: dracula,
-    extensions: extensions,
-    onChange,
-    onUpdate(v) {
-      editor.current = v.view;
-    },
-  });
+  const handleExecute = (e: React.FormEvent) => {
+    e.preventDefault();
+    onExecute(currentState.code, currentState.stdin, problemIndex);
+  };
 
   const hasError =
-    executionResult?.stderr && executionResult.stderr.trim() !== "";
+    currentState.executionResult?.stderr &&
+    currentState.executionResult.stderr.trim() !== "";
 
   return (
-    <main>
-      <section className="code-execution">
+    <main className="code-execution">
+      <section>
         <h2 className="code-execution__title">コード実行</h2>
         <form onSubmit={handleExecute} className="code-execution__form">
           <div className="sub-section">
             <h3 className="code-execution__subtitle">言語</h3>
             <select
               className="language-select"
-              value={language}
-              onChange={(e) => onLanguageChange(e.target.value)}
+              value={currentState.language}
+              onChange={(e) => handleLanguageChange(e.target.value)}
+              disabled={disabled}
             >
-              <option value="python">Python (Python 3.12)</option>
+              <option value="python">Python (3.12)</option>
               <option value="java">Java (OpenJDK 17)</option>
               <option value="cpp">C++</option>
             </select>
@@ -98,23 +112,32 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
 
           <div className="sub-section">
             <h3 className="code-execution__subtitle">ソースコード</h3>
-            <div ref={setContainer} className="code-execution__editor" />
+            <CodeMirror
+              className="code-execution__editor"
+              value={currentState.code}
+              theme={dracula}
+              height="100%"
+              extensions={[getLanguageMode()]}
+              onChange={handleCodeChange}
+              editable={!disabled}
+            />
           </div>
 
           <div className="sub-section">
             <h3 className="code-execution__subtitle">標準入力</h3>
             <textarea
               className="stdin-box__textarea"
-              value={stdin}
-              onChange={(e) => setStdin(e.target.value)}
+              value={currentState.stdin}
+              onChange={(e) => handleStdinChange(e.target.value)}
               placeholder="例：1 2"
+              disabled={disabled}
             />
           </div>
 
           <div className="sub-section">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isSubmitting || disabled}
               className="code-execution__button"
             >
               {loading ? "実行中..." : "実行"}
@@ -122,7 +145,8 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
           </div>
         </form>
       </section>
-      <section className="code-execution">
+      <hr></hr>
+      <section>
         <h2 className="code-execution__title">実行結果</h2>
         <div className="sub-section">
           <table className="result-table">
@@ -130,22 +154,22 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
               <tr>
                 <th>終了コード</th>
                 <td className={hasError ? "result-table__cell--error" : ""}>
-                  {executionResult?.exitCode ?? "-"}
+                  {currentState.executionResult?.exitCode ?? "-"}
                 </td>
               </tr>
               <tr>
                 <th>実行時間</th>
                 <td>
-                  {executionResult?.executionTime != null
-                    ? `${executionResult.executionTime} ms`
+                  {currentState.executionResult?.executionTime != null
+                    ? `${currentState.executionResult.executionTime} ms`
                     : "-"}
                 </td>
               </tr>
               <tr>
                 <th>メモリ使用量</th>
                 <td>
-                  {executionResult?.memoryUsage != null
-                    ? `${executionResult.memoryUsage} KB`
+                  {currentState.executionResult?.memoryUsage != null
+                    ? `${currentState.executionResult.memoryUsage} KB`
                     : "-"}
                 </td>
               </tr>
@@ -163,8 +187,8 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
             }
             readOnly
             value={[
-              executionResult?.stdout || "",
-              executionResult?.stderr || "",
+              currentState.executionResult?.stdout || "",
+              currentState.executionResult?.stderr || "",
             ].join("\n")}
           />
         </div>

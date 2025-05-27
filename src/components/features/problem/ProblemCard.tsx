@@ -25,52 +25,45 @@ const Problem: React.FC<ProblemProps> = ({
   memoryLimit,
 }) => {
   return (
-    <main className="problem-content" id="problem">
-      <section className="">{timeLimit}</section>
-      <section className="">{memoryLimit}</section>
-      <section className="">
-        <h1>{problemName}</h1>
-      </section>
+    <main className="problem-container">
+      <h1 className="problem-title">{problemName}</h1>
+      <p>
+        実行時間制限: {timeLimit} sec / メモリ制限: {memoryLimit} MB
+      </p>
+      <div className="sub-section">
+        <h2 className="problem-subtitle">問題文</h2>
+        <p className="context">{problemText}</p>
+      </div>
 
-      <section className="problem-description">
-        <h2>問題文</h2>
-        <p>{problemText}</p>
-      </section>
+      <div className="sub-section">
+        <h2 className="problem-subtitle">制約</h2>
+        <p className="context">{constraints}</p>
+        <hr></hr>
+      </div>
 
-      {constraints && (
-        <section className="problem-constraints">
-          <h2>制約</h2>
-          <p>{constraints}</p>
-        </section>
-      )}
+      <div className="sub-section">
+        <h2 className="problem-subtitle">入力</h2>
+        <p className="context">{inputFormat}</p>
+      </div>
 
-      {inputFormat && (
-        <section className="problem-input">
-          <h2>入力</h2>
-          <p>{inputFormat}</p>
-        </section>
-      )}
+      <div className="sub-section">
+        <h2 className="problem-subtitle">出力</h2>
+        <p className="context">{outputFormat}</p>
+        <hr></hr>
+      </div>
 
-      {outputFormat && (
-        <section className="problem-output">
-          <h2>出力</h2>
-          <p>{outputFormat}</p>
-        </section>
-      )}
-
-      {inputExamples && outputExamples && (
-        <section className="problem-examples">
-          <h2>入力例</h2>
-          {inputExamples.map((example, index) => (
-            <div key={index} className="example-container">
-              <h3>入力例 {index + 1}</h3>
-              <div className="example-code">{example}</div>
-              <h3>出力例 {index + 1}</h3>
-              <div className="example-code">{outputExamples[index]}</div>
-            </div>
-          ))}
-        </section>
-      )}
+      <div className="sub-section">
+        <h2 className="problem-subtitle">入出力例</h2>
+        {inputExamples.map((example, index) => (
+          <div key={index} className="">
+            <h3>入力例 {index + 1}</h3>
+            <div className="example-code">{example}</div>
+            <h3>出力例 {index + 1}</h3>
+            <div className="example-code">{outputExamples[index]}</div>
+            <hr></hr>
+          </div>
+        ))}
+      </div>
     </main>
   );
 };

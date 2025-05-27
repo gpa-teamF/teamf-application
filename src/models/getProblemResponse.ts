@@ -11,8 +11,5 @@ export interface getProblemResponseBody {
   memoryLimit: string;
 }
 
-// 単一問題用
-// export type getProblemResponse = getProblemResponseBody;
-
 // 複数問題取得用
 export type getMultipleProblemResponse = getProblemResponseBody[];
