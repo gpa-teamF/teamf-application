@@ -119,7 +119,13 @@ const ProblemPage: React.FC = () => {
   ) => {
     if (isSubmittedMap[problemIndex]) return;
     await fetchExecution("/execute", "post", {
-      data: { code, stdin, language: problemStates[problemIndex].language },
+      data: {
+        code,
+        stdin,
+        language: problemStates[problemIndex].language,
+        timeLimit: currentProblem.timeLimit,
+        memoryLimit: currentProblem.memoryLimit,
+      },
     });
   };
 
@@ -142,9 +148,9 @@ const ProblemPage: React.FC = () => {
       { length: 5 },
       (_, idx) => ({
         testcaseId: idx + 1,
-        status: ["AC", "WA", "TLE", "MLE", "CE"][
+        status: ["AC", "WA", "TLE", "MLE", "CE", "RE"][
           Math.floor(Math.random() * 5)
-        ] as "AC" | "WA" | "TLE" | "MLE" | "CE",
+        ] as "AC" | "WA" | "TLE" | "MLE" | "CE" | "RE",
         executionTime: Math.floor(Math.random() * 20 + 5),
         memoryUsage: Math.floor(Math.random() * 500 + 800),
       })

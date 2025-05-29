@@ -1,6 +1,6 @@
 export interface testResult {
   testcaseId: number;
-  status: "AC" | "WA" | "TLE" | "MLE" | "CE";
+  status: "AC" | "WA" | "TLE" | "MLE" | "CE" | "RE";
   executionTime: number; // ms
   memoryUsage: number;   // KB
 }

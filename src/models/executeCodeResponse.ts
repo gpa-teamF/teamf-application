@@ -2,8 +2,11 @@ export interface ExecuteCodeResponseBody {
   stdout: string;
   stderr: string;
   exitCode: number;
-  executionTime: string;
-  memoryUsage: string;
+  status: string;
+  executionTimeMs: number;
+  memoryUsageKb: number;
+  error: string;
 }
+
 
 export type ExecuteCodeResponse = ExecuteCodeResponseBody;

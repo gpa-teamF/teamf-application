@@ -28,7 +28,7 @@ const Problem: React.FC<ProblemProps> = ({
     <main className="problem-container">
       <h1 className="problem-title">{problemName}</h1>
       <p>
-        実行時間制限: {timeLimit} sec / メモリ制限: {memoryLimit} MB
+        実行時間制限: {timeLimit} ms / メモリ制限: {memoryLimit} KB
       </p>
       <div className="sub-section">
         <h2 className="problem-subtitle">問題文</h2>

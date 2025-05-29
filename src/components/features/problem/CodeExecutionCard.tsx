@@ -91,6 +91,38 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
     currentState.executionResult?.stderr &&
     currentState.executionResult.stderr.trim() !== "";
 
+  const getStatusClass = (status: string) => {
+    switch (status) {
+      case "OK":
+        return "status-ok";
+      case "TLE":
+      case "MLE":
+        return "status-warning";
+      case "CE":
+      case "RE":
+        return "status-error";
+      default:
+        return "";
+    }
+  };
+
+  const renderStatusText = (status: string) => {
+    switch (status) {
+      case "OK":
+        return "OK (正常終了)";
+      case "TLE":
+        return "TLE (制限時間超過)";
+      case "MLE":
+        return "MLE (メモリ使用量超過)";
+      case "CE":
+        return "CE (コンパイルエラー)";
+      case "RE":
+        return "RE (実行時エラー)";
+      default:
+        return status;
+    }
+  };
+
   return (
     <main className="code-execution">
       <section>
@@ -104,9 +136,9 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
               onChange={(e) => handleLanguageChange(e.target.value)}
               disabled={disabled}
             >
-              <option value="python">Python (3.12)</option>
-              <option value="java">Java (OpenJDK 17)</option>
-              <option value="cpp">C++</option>
+              <option value="python">Python (Python 3.12)</option>
+              <option value="java">Java (Amazon Corretto 17)</option>
+              <option value="cpp">C++17 (GCC 11)</option>
             </select>
           </div>
 
@@ -158,18 +190,34 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
                 </td>
               </tr>
               <tr>
+                <th>ステータス</th>
+                <td>
+                  {currentState.executionResult?.status ? (
+                    <span
+                      className={`status-badge ${getStatusClass(
+                        currentState.executionResult.status
+                      )}`}
+                    >
+                      {renderStatusText(currentState.executionResult.status)}
+                    </span>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+              </tr>
+              <tr>
                 <th>実行時間</th>
                 <td>
-                  {currentState.executionResult?.executionTime != null
-                    ? `${currentState.executionResult.executionTime} ms`
+                  {currentState.executionResult?.executionTimeMs != null
+                    ? `${currentState.executionResult.executionTimeMs} ms`
                     : "-"}
                 </td>
               </tr>
               <tr>
                 <th>メモリ使用量</th>
                 <td>
-                  {currentState.executionResult?.memoryUsage != null
-                    ? `${currentState.executionResult.memoryUsage} KB`
+                  {currentState.executionResult?.memoryUsageKb != null
+                    ? `${currentState.executionResult.memoryUsageKb} KB`
                     : "-"}
                 </td>
               </tr>
@@ -187,9 +235,11 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
             }
             readOnly
             value={[
-              currentState.executionResult?.stdout || "",
-              currentState.executionResult?.stderr || "",
-            ].join("\n")}
+              currentState.executionResult?.stdout,
+              currentState.executionResult?.stderr,
+            ]
+              .filter((v) => v && v.trim() !== "")
+              .join("\n")}
           />
         </div>
       </section>

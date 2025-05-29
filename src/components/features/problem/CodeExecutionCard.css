@@ -55,11 +55,6 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
-.output-box__textarea--error {
-  color: #ff6b6b;
-  background-color: #2a0000;
-}
-
 .result-table__cell--error {
   color: #ff6b6b;
   font-weight: bold;
@@ -108,4 +103,31 @@
 }
 .output-box__textarea {
   resize: vertical;
+}
+
+.output-box__textarea.output-box__textarea--error {
+  color: #e74856;
+  /* background-color: #2a0000; */
+  border: 1.5px solid #f44336;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+  color: white;
+  font-size: 0.9em;
+}
+
+.status-ok {
+  background-color: #4caf50; /* 緑 */
+}
+
+.status-warning {
+  background-color: #ff9800; /* オレンジ */
+}
+
+.status-error {
+  background-color: #b8261b; /* 赤 */
 }
