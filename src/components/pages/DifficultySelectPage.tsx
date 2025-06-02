@@ -36,7 +36,11 @@ const DifficultySelectPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleStartClick = () => {
-    setModalContent(`レベル：${selectedLevel} で開始します。よろしいですか？`);
+    setModalContent(
+      `レベル「${
+        difficulties.find((d) => d.level === selectedLevel)?.name
+      }」で開始します。OK押下後にタイマーがスタートします。`
+    );
     setOnModalOk(() => () => {
       setIsModalOpen(false);
       navigate("/problem", { state: { level: selectedLevel } });
