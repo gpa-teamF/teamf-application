@@ -1,0 +1,258 @@
+/* src/pages/ResultPage.css */
+
+.result-container {
+  background-color: #121212;
+  color: #ffffff;
+  min-height: 100vh;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* ── 見出し ── */
+.result-container h1 {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* ── ナビゲーション ── */
+.navigation {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+/* 共通スタイル */
+.nav-button {
+  position: relative;
+  padding: 8px 16px;
+  background-color: #333;
+  color: #ccc;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* ホバー時（共通） */
+.nav-button:hover {
+  background-color: #6d32f6;
+}
+
+/* 選択中（共通） */
+.nav-button.active {
+  background-color: #915aff;
+  color: #fff;
+}
+
+/* 未提出のボタンに対する上書きスタイル */
+.nav-button.unsubmitted {
+  background-color: #444;
+  color: #aaa;
+}
+
+/* 未提出 + ホバー */
+.nav-button.unsubmitted:hover {
+  background-color: #7a7a7a;
+  color: #fff;
+}
+
+/* 未提出 + 選択中 */
+.nav-button.unsubmitted.active {
+  background-color: #999;
+  color: #fff;
+}
+
+/* 「未提出」テキストのスタイル */
+.unsubmitted-text {
+  display: block;
+  font-size: 10px;
+  color: #ff6b6b;
+  margin-top: 4px;
+}
+
+/* ── メインコンテンツ（左スコア・右チャート） ── */
+.main-content {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+/* 左側：スコアとランクのボックス */
+.score-box {
+  background-color: #1f1f2b;
+  padding: 16px;
+  border-radius: 12px;
+  width: 200px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+
+.score-box h2 {
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+  color: #eee;
+}
+
+/* .score-value {
+  font-size: 2.5rem;
+  margin: 8px 0;
+  color: #fff;
+} */
+
+.score-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.score-max {
+  font-size: 1.2rem;
+  color: #ccc;
+  margin-left: 4px;
+}
+
+
+.rank-text {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 8px 0;
+}
+
+/* 評価基準ボタン */
+.criteria-button {
+  margin-top: 16px;
+  background-color: #9333ea;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.criteria-button:hover {
+  background-color: #a855f7;
+}
+
+.no-result {
+  color: #777;
+  font-size: 0.9rem;
+}
+
+/* 右側：レーダーチャート */
+.chart-wrapper {
+  background-color: #1f1f2b;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* 未提出や総合タブでデータがない場合の表示 */
+.no-chart {
+  width: 300px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+/* ── テーブル ── */
+.table-heading {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.table-wrapper {
+  margin-top: 12px;
+  overflow-x: auto; /* 横にスライド可能にする */
+}
+
+.test-result-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* 横スクロールしたときに見やすくするための最小幅 */
+  background-color: #1f1f2b;
+  color: #eee;
+}
+
+.test-result-table th,
+.test-result-table td {
+  border: 1px solid #444;
+  padding: 8px;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+/* 左端列を固定 */
+.sticky-col-left {
+  position: sticky;
+  left: 0;
+  background-color: #2b2b3b;
+  z-index: 2;
+}
+
+/* 右端列を固定 */
+.sticky-col-right {
+  position: sticky;
+  right: 0;
+  background-color: #2b2b3b;
+  z-index: 2;
+}
+
+/* テーブルのヘッダー行を固定したい場合は以下を追加可能 */
+.test-result-table thead tr th {
+  position: sticky;
+  top: 0;
+  background-color: #2b2b3b;
+  z-index: 3;
+ }
+
+/* テーブル行のホバー */
+.test-result-table tbody tr:hover {
+  background-color: #2f2f3f;
+}
+
+/* ── 戻るボタン ── */
+.button-row {
+  text-align: center;
+  margin-top: 32px;
+}
+
+.back-button {
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.back-button:hover {
+  background-color: #666;
+}
+
+.survey-box {
+  margin: 24px 0;
+  padding: 16px;
+  border: 2px solid #eddbff;
+  background-color: #8a27bf;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 24px;
+  color: #ccc;
+}
+
+.survey-box a {
+  color: #102cde;
+  font-weight: bold;
+  text-decoration: underline;
+}

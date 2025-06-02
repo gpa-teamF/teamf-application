@@ -1,11 +1,11 @@
-export interface testResult {
+export interface TestResult {
   testcaseId: number;
   status: "AC" | "WA" | "TLE" | "MLE" | "CE" | "RE";
   executionTime: number; // ms
   memoryUsage: number;   // KB
 }
 
-export interface evaluateResult {
+export interface EvaluateResult {
   totalScore: number;
   correctnessScore: number;
   performanceScore: number;
@@ -14,9 +14,12 @@ export interface evaluateResult {
   readabilityScore: number;
   }
 
-export type testResults = testResult[];
+export type TestResults = TestResult[];
 
-export interface evaluateCodeResponse {
-  testResults: testResults;
-  evaluateResult: evaluateResult
+export interface SubmitResult {
+  testResults: TestResults;
+  evaluateResult: EvaluateResult
+  error: string
 }
+
+export type SubmitResultResponse = SubmitResult;

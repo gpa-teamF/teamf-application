@@ -1,4 +1,4 @@
-export interface ExecuteCodeResponseBody {
+export interface ExecuteResult {
   stdout: string;
   stderr: string;
   exitCode: number;
@@ -9,4 +9,4 @@ export interface ExecuteCodeResponseBody {
 }
 
 
-export type ExecuteCodeResponse = ExecuteCodeResponseBody;
+export type ExecuteCodeResponse = ExecuteResult;

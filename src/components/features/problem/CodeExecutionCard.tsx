@@ -5,42 +5,29 @@ import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
 import { cpp } from "@codemirror/lang-cpp";
 import "./CodeExecutionCard.css";
-import { ExecuteCodeResponse } from "../../../models/executeCodeResponse";
-
-export interface ProblemState {
-  code: string;
-  stdin: string;
-  language: string;
-  executionResult?: ExecuteCodeResponse;
-}
+import { ProblemState } from "../../../models/problemState";
 
 export interface CodeExecutionCardProps {
-  problemIndex: number;
-  onExecute: (code: string, stdin: string, problemIndex: number) => void;
   loading: boolean;
   isSubmitting: boolean;
-  onLanguageChange: (lang: string, problemIndex: number) => void;
-  problemStates: ProblemState[];
-  setProblemStates: React.Dispatch<React.SetStateAction<ProblemState[]>>;
-  disabled?: boolean;
+  isSubmitted?: boolean;
+  currentState: ProblemState;
+  onCodeChange: (code: string) => void;
+  onStdinChange: (stdin: string) => void;
+  onLanguageChange: (lang: string) => void;
+  onExecute: (code: string, stdin: string) => void;
 }
 
 const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
-  problemIndex,
-  onExecute,
   loading,
   isSubmitting,
+  isSubmitted,
+  currentState,
+  onCodeChange,
+  onStdinChange,
   onLanguageChange,
-  problemStates,
-  setProblemStates,
-  disabled,
+  onExecute,
 }) => {
-  const currentState = problemStates[problemIndex] || {
-    code: "",
-    stdin: "",
-    language: "python",
-  };
-
   const getLanguageMode = () => {
     switch (currentState.language) {
       case "python":
@@ -55,36 +42,20 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
   };
 
   const handleCodeChange = (value: string) => {
-    const newStates = [...problemStates];
-    newStates[problemIndex] = {
-      ...newStates[problemIndex],
-      code: value,
-    };
-    setProblemStates(newStates);
-  };
-
-  const handleLanguageChange = (lang: string) => {
-    const newStates = [...problemStates];
-    newStates[problemIndex] = {
-      ...newStates[problemIndex],
-      language: lang,
-    };
-    setProblemStates(newStates);
-    onLanguageChange(lang, problemIndex);
+    onCodeChange(value);
   };
 
   const handleStdinChange = (value: string) => {
-    const newStates = [...problemStates];
-    newStates[problemIndex] = {
-      ...newStates[problemIndex],
-      stdin: value,
-    };
-    setProblemStates(newStates);
+    onStdinChange(value);
+  };
+
+  const handleLanguageChange = (lang: string) => {
+    onLanguageChange(lang);
   };
 
   const handleExecute = (e: React.FormEvent) => {
     e.preventDefault();
-    onExecute(currentState.code, currentState.stdin, problemIndex);
+    onExecute(currentState.code, currentState.stdin);
   };
 
   const hasError =
@@ -134,7 +105,7 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
               className="language-select"
               value={currentState.language}
               onChange={(e) => handleLanguageChange(e.target.value)}
-              disabled={disabled}
+              disabled={isSubmitted}
             >
               <option value="python">Python (Python 3.12)</option>
               <option value="java">Java (Amazon Corretto 17)</option>
@@ -151,7 +122,7 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
               height="100%"
               extensions={[getLanguageMode()]}
               onChange={handleCodeChange}
-              editable={!disabled}
+              editable={!isSubmitted}
             />
           </div>
 
@@ -162,14 +133,14 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
               value={currentState.stdin}
               onChange={(e) => handleStdinChange(e.target.value)}
               placeholder="例：1 2"
-              disabled={disabled}
+              disabled={isSubmitted}
             />
           </div>
 
           <div className="sub-section">
             <button
               type="submit"
-              disabled={loading || isSubmitting || disabled}
+              disabled={loading || isSubmitting || isSubmitted}
               className="code-execution__button"
             >
               {loading ? "実行中..." : "実行"}
@@ -177,7 +148,8 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
           </div>
         </form>
       </section>
-      <hr></hr>
+      <hr />
+
       <section>
         <h2 className="code-execution__title">実行結果</h2>
         <div className="sub-section">
@@ -206,7 +178,7 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
                 </td>
               </tr>
               <tr>
-                <th>実行時間</th>
+                <th>実行時間 (ms)</th>
                 <td>
                   {currentState.executionResult?.executionTimeMs != null
                     ? `${currentState.executionResult.executionTimeMs} ms`
@@ -214,7 +186,7 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
                 </td>
               </tr>
               <tr>
-                <th>メモリ使用量</th>
+                <th>メモリ使用量 (KB)</th>
                 <td>
                   {currentState.executionResult?.memoryUsageKb != null
                     ? `${currentState.executionResult.memoryUsageKb} KB`
@@ -237,12 +209,41 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
             value={[
               currentState.executionResult?.stdout,
               currentState.executionResult?.stderr,
+              currentState.executionResult?.error,
             ]
               .filter((v) => v && v.trim() !== "")
               .join("\n")}
           />
         </div>
       </section>
+
+      {currentState.submitResult && (
+        <section>
+          <h2 className="code-execution__title">提出結果</h2>
+          <div className="sub-section">
+            <table className="result-table">
+              <tbody>
+                <tr>
+                  <th>合計スコア</th>
+                  <td>{currentState.submitResult.evaluateResult.totalScore}</td>
+                </tr>
+                <tr>
+                  <th>正答率</th>
+                  <td>
+                    {currentState.submitResult.evaluateResult.correctnessScore}
+                  </td>
+                </tr>
+                <tr>
+                  <th>パフォーマンス</th>
+                  <td>
+                    {currentState.submitResult.evaluateResult.performanceScore}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </main>
   );
 };

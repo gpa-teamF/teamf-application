@@ -8,5 +8,5 @@ export interface ApiState<T> {
     url: string,
     method: Method,
     config?: AxiosRequestConfig
-  ) => Promise<void>;
+  ) => Promise<T | undefined>;
 }

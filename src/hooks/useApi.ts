@@ -13,7 +13,7 @@ const useApi = <T>(initialData: T | null = null): ApiState<T> => {
       url: string,
       method: Method = "get",
       config: AxiosRequestConfig = {}
-    ) => {
+    ): Promise<T | undefined> => {
       setLoading(true);
       setError(null);
 
@@ -24,6 +24,7 @@ const useApi = <T>(initialData: T | null = null): ApiState<T> => {
           ...config,
         });
         setData(response.data);
+        return response.data;
       } catch (e: unknown) {
         if (axios.isAxiosError(e)) {
           setError(
@@ -33,6 +34,7 @@ const useApi = <T>(initialData: T | null = null): ApiState<T> => {
         } else {
           setError("An unexpected error occurred");
         }
+        return undefined;
       } finally {
         setLoading(false);
       }

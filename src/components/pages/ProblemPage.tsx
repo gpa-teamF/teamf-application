@@ -1,30 +1,42 @@
-import React, { useState, useEffect } from "react";
-import Problem from "../features/problem/ProblemCard";
-import CodeExecutionCard, {
-  ProblemState,
-} from "../features/problem/CodeExecutionCard";
-import SubmissionResult from "../features/problem/SubmissionResult";
+import React, { useEffect, useState } from "react";
+import CodeExecutionCard from "../features/problem/CodeExecutionCard";
+import SubmissionCard from "../features/problem/SubmissionCard";
 import Layout from "../layout/Layout";
 import useApi from "../../hooks/useApi";
-import {
-  getMultipleProblemResponse,
-  getProblemResponseBody,
-} from "../../models/getProblemResponse";
 import OverlayLoading from "../common/OverlayLoading";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CenteredCardLayout from "../layout/CenteredCardLayout";
 import "./ProblemPage.css";
 import { ExecuteCodeResponse } from "../../models/executeCodeResponse";
+import { ProblemState } from "../../models/problemState";
 import {
-  testResults,
-  evaluateResult,
-  evaluateCodeResponse,
-} from "../../models/evaluateCodeResponse";
+  GetProblemsResponse,
+  ProblemData,
+} from "../../models/getProblemsResponse";
+import {
+  SubmitResult,
+  SubmitResultResponse,
+} from "../../models/submitResultResponse";
+import ProblemCard from "../features/problem/ProblemCard";
+import Modal from "../common/Modal";
+import ProblemNavigationCard from "../features/problem/ProblemNavigationCard";
 
 const ProblemPage: React.FC = () => {
   const location = useLocation();
   const { level } = location.state || {};
-  const [problems, setProblems] = useState<getProblemResponseBody[]>([]);
+  const [problems, setProblems] = useState<ProblemData[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState("");
+  const [onModalOk, setOnModalOk] = useState<() => void>(() => {});
+  const [modalMode, setModalMode] = useState<
+    | "canNotSubmit"
+    | "submitConfirm"
+    | "submitError"
+    | "notAllSubmitted"
+    | "gotoResultConfirm"
+  >("canNotSubmit");
+  const navigate = useNavigate();
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [problemStates, setProblemStates] = useState<ProblemState[]>([]);
   const [isSubmittedMap, setIsSubmittedMap] = useState<Record<number, boolean>>(
@@ -33,84 +45,75 @@ const ProblemPage: React.FC = () => {
   const [isSubmittingMap, setIsSubmittingMap] = useState<
     Record<number, boolean>
   >({});
-  const [submissionTestResults, setSubmissionTestResults] = useState<
-    Record<number, testResults | null>
-  >({});
-  const [submissionEvaluateResults, setSubmissionEvaluateResults] = useState<
-    Record<number, evaluateResult | null>
+  const [submissionResults, setSubmissionResults] = useState<
+    Record<number, SubmitResult | null>
   >({});
 
-  const {
-    data: problemData,
-    error: problemError,
-    loading: problemLoading,
-    fetchData: fetchProblem,
-  } = useApi<getMultipleProblemResponse>();
+  const { loading: problemLoading, fetchData: fetchProblem } =
+    useApi<GetProblemsResponse>();
 
-  const {
-    data: executionResult,
-    error: executionError,
-    loading: executionLoading,
-    fetchData: fetchExecution,
-  } = useApi<ExecuteCodeResponse>();
+  const { loading: executionLoading, fetchData: fetchExecution } =
+    useApi<ExecuteCodeResponse>();
 
-  // const {
-  //   data: submissionResult,
-  //   error: submissionError,
-  //   loading: submissionLoading,
-  //   fetchData: fetchSubmission,
-  // } = useApi<evaluateCodeResponse>();
+  const { loading: submitLoading, fetchData: fetchSubmission } =
+    useApi<SubmitResultResponse>();
 
   useEffect(() => {
-    if (level) {
-      fetchProblem("/problem", "get", {
-        params: {
-          difficulty: level,
-          count: 3,
-        },
+    const loadProblems = async () => {
+      if (!level) return;
+      const res = await fetchProblem("/problem", "get", {
+        params: { difficulty: level, count: 3 },
       });
-    }
-  }, [fetchProblem, level]);
+      if (res) {
+        setProblems(res);
+        setProblemStates(
+          res.map(() => ({
+            code: "",
+            stdin: "",
+            language: "python",
+            executionResult: undefined,
+          }))
+        );
 
-  useEffect(() => {
-    if (problemData) {
-      setProblems(problemData);
-      const initialStates = problemData.map(() => ({
-        code: "",
-        stdin: "",
-        language: "python",
-        executionResult: undefined,
-      }));
-      setProblemStates(initialStates);
-      const initialTestResults: Record<number, testResults | null> = {};
-      const initialEvalResults: Record<number, evaluateResult | null> = {};
-      const initialSubmitting: Record<number, boolean> = {};
-      const initialSubmitted: Record<number, boolean> = {};
-      problemData.forEach((_, idx) => {
-        initialTestResults[idx] = null;
-        initialEvalResults[idx] = null;
-        initialSubmitting[idx] = false;
-        initialSubmitted[idx] = false;
-      });
-      setSubmissionTestResults(initialTestResults);
-      setSubmissionEvaluateResults(initialEvalResults);
-      setIsSubmittingMap(initialSubmitting);
-      setIsSubmittedMap(initialSubmitted);
-    }
-  }, [problemData]);
+        const initialMap: Record<number, boolean> = {};
+        const initialResults: Record<number, SubmitResultResponse | null> = {};
+        res.forEach((_, idx) => {
+          initialMap[idx] = false;
+          initialResults[idx] = null;
+        });
 
-  useEffect(() => {
-    if (executionResult !== null && executionResult !== undefined) {
-      setProblemStates((prevStates) => {
-        const newStates = [...prevStates];
-        newStates[currentIndex] = {
-          ...newStates[currentIndex],
-          executionResult,
-        };
-        return newStates;
-      });
-    }
-  }, [executionResult, currentIndex]);
+        setIsSubmittingMap(initialMap);
+        setIsSubmittedMap(initialMap);
+        setSubmissionResults(initialResults);
+      }
+    };
+
+    loadProblems();
+  }, [level, fetchProblem]);
+
+  const updateCode = (index: number, code: string) => {
+    setProblemStates((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], code };
+      return updated;
+    });
+  };
+
+  const updateStdin = (index: number, stdin: string) => {
+    setProblemStates((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], stdin };
+      return updated;
+    });
+  };
+
+  const updateLanguage = (index: number, language: string) => {
+    setProblemStates((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], language };
+      return updated;
+    });
+  };
 
   const handleCodeExecute = async (
     code: string,
@@ -118,105 +121,156 @@ const ProblemPage: React.FC = () => {
     problemIndex: number
   ) => {
     if (isSubmittedMap[problemIndex]) return;
-    await fetchExecution("/execute", "post", {
+
+    const res = await fetchExecution("/execute", "post", {
       data: {
         code,
         stdin,
         language: problemStates[problemIndex].language,
-        timeLimit: currentProblem.timeLimit,
-        memoryLimit: currentProblem.memoryLimit,
+        timeLimit: problems[problemIndex].timeLimit,
+        memoryLimit: problems[problemIndex].memoryLimit,
       },
     });
+
+    if (res) {
+      setProblemStates((prev) => {
+        const updated = [...prev];
+        updated[problemIndex] = {
+          ...updated[problemIndex],
+          executionResult: res,
+        };
+        return updated;
+      });
+    }
   };
 
-  const handleSelectIndex = (index: number) => {
-    setCurrentIndex(index);
+  const handleSubmit = () => {
+    const currentProblemId = problems[currentIndex]?.problemId;
+    const currentState = problemStates[currentIndex];
+
+    if (!currentProblemId || !currentState || isSubmittedMap[currentIndex])
+      return;
+
+    if (!currentState.code.trim()) {
+      setModalMode("canNotSubmit");
+      setModalContent("ソースコードが空です。コードを記述してください。");
+      setOnModalOk(() => () => setIsModalOpen(false));
+      setIsModalOpen(true);
+      return;
+    }
+
+    // 確認ダイアログを表示
+    setModalMode("submitConfirm");
+    setModalContent("この問題を提出しますか？提出は一度きりです。");
+    setOnModalOk(() => () => {
+      setIsModalOpen(false);
+      doSubmit();
+    });
+    setIsModalOpen(true);
   };
 
-  const handleLanguageChange = (lang: string, problemIndex: number) => {
-    const newStates = [...problemStates];
-    newStates[problemIndex] = {
-      ...newStates[problemIndex],
-      language: lang,
-    };
-    setProblemStates(newStates);
+  const doSubmit = async () => {
+    const currentProblemId = problems[currentIndex]?.problemId;
+    const currentState = problemStates[currentIndex];
+
+    if (!currentProblemId || !currentState) return;
+
+    try {
+      setIsSubmittingMap((prev) => ({ ...prev, [currentIndex]: true }));
+
+      const res = await fetchSubmission("/submit", "post", {
+        data: {
+          code: currentState.code,
+          language: currentState.language,
+          problemId: currentProblemId,
+        },
+      });
+
+      if (res) {
+        setSubmissionResults((prev) => ({
+          ...prev,
+          [currentIndex]: res,
+        }));
+        setIsSubmittedMap((prev) => ({ ...prev, [currentIndex]: true }));
+      } else {
+        setModalMode("submitError");
+        setModalContent("提出中にエラーが発生しました。もう一度お試し下さい。");
+        setOnModalOk(() => () => {
+          setIsModalOpen(false);
+          doSubmit();
+        });
+        setIsModalOpen(true);
+      }
+    } catch (e) {
+      console.error("提出エラー:", e);
+      alert("提出中にエラーが発生しました。もう一度お試しください。");
+    } finally {
+      setIsSubmittingMap((prev) => ({ ...prev, [currentIndex]: false }));
+    }
   };
 
-  const handleSubmit = async () => {
-    // API呼び出しの代替：ダミーデータ
-    const simulatedTestResults: testResults = Array.from(
-      { length: 5 },
-      (_, idx) => ({
-        testcaseId: idx + 1,
-        status: ["AC", "WA", "TLE", "MLE", "CE", "RE"][
-          Math.floor(Math.random() * 5)
-        ] as "AC" | "WA" | "TLE" | "MLE" | "CE" | "RE",
-        executionTime: Math.floor(Math.random() * 20 + 5),
-        memoryUsage: Math.floor(Math.random() * 500 + 800),
-      })
-    );
+  const getModalTitle = () => {
+    switch (modalMode) {
+      case "canNotSubmit":
+        return "提出できません";
+      case "submitConfirm":
+        return "提出しますか？";
+      case "submitError":
+        return "提出に失敗しました";
+      case "notAllSubmitted":
+        return "未提出の問題があります";
+      case "gotoResultConfirm":
+        return "リザルト画面へ進む";
+      default:
+        return "確認";
+    }
+  };
 
-    const simulatedEvalResult: evaluateResult = {
-      totalScore: 85,
-      correctnessScore: 90,
-      performanceScore: 80,
-      algorithmsScore: 75,
-      codeQualityScore: 88,
-      readabilityScore: 92,
-    };
+  const getModalShowCancelButton = () => {
+    switch (modalMode) {
+      case "canNotSubmit":
+        return false;
+      case "submitConfirm":
+      case "submitError":
+      case "notAllSubmitted":
+      case "gotoResultConfirm":
+      default:
+        return true;
+    }
+  };
 
-    setIsSubmittingMap((prev) => ({ ...prev, [currentIndex]: true }));
+  const navigateToResult = () => {
+    const hasUnsubmitted = problems.some((_, index) => !isSubmittedMap[index]);
 
-    await new Promise((res) => setTimeout(res, 1000));
-
-    setSubmissionTestResults((prev) => ({
-      ...prev,
-      [currentIndex]: simulatedTestResults,
-    }));
-    setSubmissionEvaluateResults((prev) => ({
-      ...prev,
-      [currentIndex]: simulatedEvalResult,
-    }));
-    setIsSubmittedMap((prev) => ({ ...prev, [currentIndex]: true }));
-    setIsSubmittingMap((prev) => ({ ...prev, [currentIndex]: false }));
-
-    // // 実際にAPIを呼び出す
-    // const currentProblemId = problems[currentIndex]?.problemId;
-    // const currentState = problemStates[currentIndex];
-    // if (!currentProblemId || !currentState || isSubmittedMap[currentIndex])
-    //   return;
-
-    // setIsSubmittingMap((prev) => ({ ...prev, [currentIndex]: true }));
-
-    // await fetchSubmission("/submit", "post", {
-    //   data: {
-    //     code: currentState.code,
-    //     stdin: currentState.stdin,
-    //     language: currentState.language,
-    //     problemId: currentProblemId,
-    //   },
-    // });
-
-    // if (submissionResult) {
-    //   setSubmissionTestResults((prev) => ({
-    //     ...prev,
-    //     [currentIndex]: submissionResult.testResults,
-    //   }));
-    //   setSubmissionEvaluateResults((prev) => ({
-    //     ...prev,
-    //     [currentIndex]: submissionResult.evaluateResult,
-    //   }));
-    //   setIsSubmittedMap((prev) => ({ ...prev, [currentIndex]: true }));
-    // } else if (submissionError) {
-    //   console.error("提出失敗:", submissionError);
-    // }
-
-    // setIsSubmittingMap((prev) => ({ ...prev, [currentIndex]: false }));
+    if (hasUnsubmitted) {
+      setModalMode("notAllSubmitted");
+      setModalContent(
+        "未提出の問題があります。本当に最終リザルトへ進みますか？問題ページには戻れません。"
+      );
+      setOnModalOk(() => () => {
+        setIsModalOpen(false);
+        navigate("/result", {
+          state: { submissionResults },
+        });
+      });
+      setIsModalOpen(true);
+    } else {
+      setModalMode("gotoResultConfirm");
+      setModalContent(
+        "本当に最終リザルトへ進みますか？ 問題ページには戻れません。"
+      );
+      setOnModalOk(() => () => {
+        setIsModalOpen(false);
+        navigate("/result", {
+          state: { submissionResults: submissionResults },
+        });
+      });
+      setIsModalOpen(true);
+    }
   };
 
   const currentProblem = problems[currentIndex];
-  const currentTestResults = submissionTestResults[currentIndex] || [];
-  const currentEvaluateResult = submissionEvaluateResults[currentIndex] || null;
+  const currentSubmitResult = submissionResults[currentIndex] || null;
   const isCurrentSubmitting = isSubmittingMap[currentIndex] || false;
   const isCurrentSubmitted = isSubmittedMap[currentIndex] || false;
 
@@ -227,59 +281,50 @@ const ProblemPage: React.FC = () => {
           isLoading={problemLoading || executionLoading}
           size={100}
         />
-        {problemError ? (
-          <p>Error: {problemError}</p>
-        ) : (
-          <div>
-            {currentProblem && (
-              <>
-                <div className="problem-navigation">
-                  {problems.map((_, idx) => (
-                    <button
-                      key={idx}
-                      className={`nav-button ${
-                        idx === currentIndex ? "active" : ""
-                      }`}
-                      onClick={() => handleSelectIndex(idx)}
-                    >
-                      {idx + 1}
-                    </button>
-                  ))}
-                </div>
-                <Problem
-                  problemName={currentProblem.problemName}
-                  problemText={currentProblem.problemText}
-                  constraints={currentProblem.constraints}
-                  inputFormat={currentProblem.inputFormat}
-                  outputFormat={currentProblem.outputFormat}
-                  inputExamples={currentProblem.inputExamples}
-                  outputExamples={currentProblem.outputExamples}
-                  timeLimit={currentProblem.timeLimit}
-                  memoryLimit={currentProblem.memoryLimit}
-                />
+        <div>
+          {currentProblem && (
+            <>
+              <ProblemNavigationCard
+                currentIndex={currentIndex}
+                problems={problems}
+                onSelectProblem={(index) => setCurrentIndex(index)}
+                onClickResult={navigateToResult}
+              />
 
-                <CodeExecutionCard
-                  problemIndex={currentIndex}
-                  onExecute={handleCodeExecute}
-                  loading={executionLoading}
-                  isSubmitting={isCurrentSubmitting}
-                  onLanguageChange={handleLanguageChange}
-                  problemStates={problemStates}
-                  setProblemStates={setProblemStates}
-                  disabled={isCurrentSubmitted}
-                />
+              <ProblemCard problemData={currentProblem} />
 
-                <SubmissionResult
-                  isSubmitting={isCurrentSubmitting}
-                  testResults={currentTestResults}
-                  evaluateResult={currentEvaluateResult}
-                  onSubmit={handleSubmit}
-                  isSubmitted={isCurrentSubmitted}
-                />
-              </>
-            )}
-          </div>
-        )}
+              <CodeExecutionCard
+                loading={executionLoading}
+                isSubmitting={isCurrentSubmitting}
+                isSubmitted={isCurrentSubmitted}
+                currentState={problemStates[currentIndex]}
+                onCodeChange={(code) => updateCode(currentIndex, code)}
+                onStdinChange={(stdin) => updateStdin(currentIndex, stdin)}
+                onLanguageChange={(lang) => updateLanguage(currentIndex, lang)}
+                onExecute={(code, stdin) =>
+                  handleCodeExecute(code, stdin, currentIndex)
+                }
+              />
+
+              <SubmissionCard
+                isSubmitting={isCurrentSubmitting}
+                isSubmitted={isCurrentSubmitted}
+                onSubmit={handleSubmit}
+                submitResult={currentSubmitResult}
+              />
+
+              <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onOk={onModalOk}
+                title={getModalTitle()}
+                showCancelButton={getModalShowCancelButton()}
+              >
+                <p>{modalContent}</p>
+              </Modal>
+            </>
+          )}
+        </div>
       </CenteredCardLayout>
     </Layout>
   );

@@ -1,0 +1,81 @@
+.submission-container {
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
+  padding: 1.5rem;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  overflow-x: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.submission__title {
+  line-height: 1;
+}
+
+.sub-section {
+  padding: 0.5rem;
+  max-width: 100%;
+}
+
+.submission__subtitle {
+  line-height: 1;
+}
+
+.submission-result-table {
+  width: 80%;
+  border-collapse: collapse;
+}
+
+.submission-result-table th,
+.submission-result-table td {
+  text-align: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+  color: white;
+  font-size: 0.9em;
+}
+
+.status-ac {
+  background-color: #1aa81f; /* 緑 */
+}
+
+.status-wa {
+  background-color: #3263b7; /* 青 */
+}
+
+.status-warning {
+  background-color: #ff9800; /* オレンジ */
+}
+
+.status-error {
+  background-color: #b8261b; /* 赤 */
+}
+
+.submit-button {
+  background-color: #915aff;
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #6d32f6;
+}
+
+.submit-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
