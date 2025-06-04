@@ -11,33 +11,32 @@ const difficulties = [
   {
     level: "easy",
     name: "初級",
-    description:
-      "初級者向け\nプログラミング初心者や競技プログラミング未経験者向けの難易度です。",
+    description: "プログラミング初心者 / 競技プログラミング未経験者向け",
   },
   {
     level: "medium",
     name: "中級",
-    description:
-      "中級者向け\n基本的なアルゴリズムやデータ構造にある程度慣れている方向けです。",
+    description: "基本的なアルゴリズムやデータ構造にある程度慣れている方向け",
   },
   {
     level: "hard",
     name: "上級",
-    description:
-      "上級者向け\n難解な問題や高度な実装に挑戦したい方向けの難易度です。",
+    description: "難解な問題や高度な実装に挑戦したい方向け",
   },
 ];
 
 const DifficultySelectPage: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState("easy");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState("");
+  const [modalContent, setModalContent] = useState<React.ReactNode>("");
+  const [modalTitle, setModalTitle] = useState("");
   const [modalShowCancel, setModalShowCancel] = useState(false);
   const [modalWidth, setModalWidth] = useState("");
   const [onModalOk, setOnModalOk] = useState<() => void>(() => {});
   const navigate = useNavigate();
 
   const handleStartClick = () => {
+    setModalTitle("開始");
     setModalWidth("30%");
     setModalShowCancel(true);
     setModalContent(
@@ -53,19 +52,92 @@ const DifficultySelectPage: React.FC = () => {
   };
 
   const handleHowToUseClick = () => {
-    setModalWidth("180%");
+    setModalTitle("利用方法");
+    setModalWidth("40%");
     setModalShowCancel(false);
     setModalContent(
-      "【利用方法】\n・[タイマー]：問題名の横に残り時間が表示されます。\n・[問題]：問題文や制約、入出力例などが表示されます。問題は上部のボタンで自由に切り替えられます。\n・[コード実行]：言語/ソースコード/標準入力を自由に選択/入力できます。\n・[実行]ボタン：ソースコードを入力してボタン押下するとその実行結果が表示されます。何度でも実行することができます。（不必要な実行はお控えください。）\n・[提出ボタン]：押下するとテストケースの結果とソースコードの評価が表示されます。問題ごとに1回のみ提出することができます。\n・[最終リザルトへ]ボタン：問題回答を終了し、リザルト画面を表示します。未提出の問題があってもリザルトへ進めますが、問題画面には戻れません。\n\n【判定結果】\n・[AC]：正解 / [WA]：不正解 / [TLE]：正解かつ実行時間制限超過 / [OLE]：正解かつメモリ使用量制限超過 / [RE]：実行時エラー / [CE]：コンパイルエラー\n\n【ソースコードの評価】\n・[正確性]：正答率を元に評価します。（正解したテストケースが対象）\n・[パフォーマンス]：基準値を元に実行時間とメモリ使用量から評価します。小規模なテストケースほど厳しく評価します。（全てのテストケースが対象）\n・[アルゴリズム]：基準値を元に実行時間とメモリ使用量から評価します。（正解した大規模テストケースが対象）\n・[コード品質]：Linterを用いて評価します。関数の有無、docstringの有無、エントリポイントの有無、ネストの深さ等が評価に影響します。\n・[可読性]：フォーマッタを用いて評価します。元のソースコードとフォーマット後を比較して差分が多いと減点されます。"
+      <>
+        <ul>
+          <li>タイマー：問題名の横に残り時間が表示されます。</li>
+          <li>
+            問題：問題文や制約、入出力例などが表示されます。問題は上部のボタンで自由に切り替えられます。
+          </li>
+          <li>
+            コード実行：言語/ソースコード/標準入力を自由に選択/入力できます。実行は何度でもできます。
+          </li>
+          <li>
+            提出：テストケースによる正誤判定とソースコードの評価を行います。提出は問題ごとに1回のみ可能です。
+          </li>
+          <li>
+            [最終リザルトへ]ボタン：問題回答を終了してリザルト画面に進みます。問題画面には戻れません。
+          </li>
+        </ul>
+      </>
     );
     setOnModalOk(() => () => setIsModalOpen(false));
+    setIsModalOpen(true);
+  };
+
+  const handleExecuteResultClick = () => {
+    setModalTitle("判定結果");
+    setModalWidth("30%");
+    setModalShowCancel(false);
+    setModalContent(
+      <>
+        <ul>
+          <li>AC：正解</li>
+          <li>WA：不正解</li>
+          <li>TLE：正解かつ実行時間制限超過</li>
+          <li>OLE：正解かつメモリ使用量制限超過 </li>
+          <li>RE：実行時エラー</li>
+          <li>CE：コンパイルエラー</li>
+        </ul>
+      </>
+    );
+    setOnModalOk(() => () => setIsModalOpen(false));
+    setIsModalOpen(true);
+  };
+
+  const handleCriteriaClick = () => {
+    setModalTitle("評価基準");
+    setModalWidth("40%");
+    setModalContent(
+      <>
+        <ul>
+          <li>正確性 ：テストケースの通過率に応じて点数を付与。</li>
+          <li>
+            パフォーマンス ：
+            基準値を元に実行時間とメモリ使用量から評価。小規模なテストケースほど厳しく評価。
+          </li>
+          <li>
+            アルゴリズム ：
+            基準値を元に実行時間とメモリ使用量から評価。対象は大規模テストケース限定。
+          </li>
+          <li>
+            コード品質 ： Linterを用いて評価。関数 / docstring /
+            エントリポイント / ネストの深さなどが評価に影響。
+          </li>
+          <li>
+            可読性 ：
+            フォーマッタを用いて評価。元のソースコードとフォーマット後を比較して差分が多いと減点。
+          </li>
+        </ul>
+      </>
+    );
+    setOnModalOk(() => () => {
+      setIsModalOpen(false);
+    });
     setIsModalOpen(true);
   };
 
   return (
     <Layout>
       <CenteredCardLayout>
-        <RuleCard onHowToUseClick={handleHowToUseClick} />
+        <RuleCard
+          onHowToUseClick={handleHowToUseClick}
+          onExecuteResultClick={handleExecuteResultClick}
+          onCriteriaClick={handleCriteriaClick}
+        />
 
         <div className="difficulty-select-section">
           <h2>難易度を選択してください</h2>
@@ -91,7 +163,7 @@ const DifficultySelectPage: React.FC = () => {
           onClose={() => setIsModalOpen(false)}
           showCancelButton={modalShowCancel}
           onOk={onModalOk}
-          title="確認"
+          title={modalTitle}
           width={modalWidth}
         >
           <p>{modalContent}</p>

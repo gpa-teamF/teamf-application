@@ -91,6 +91,10 @@
   width: 200px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .score-box h2 {
@@ -99,11 +103,11 @@
   color: #eee;
 }
 
-/* .score-value {
+.score-value {
   font-size: 2.5rem;
   margin: 8px 0;
   color: #fff;
-} */
+}
 
 .score-value {
   font-size: 2.5rem;
@@ -145,15 +149,20 @@
 /* 右側：レーダーチャート */
 .chart-wrapper {
   background-color: #1f1f2b;
-  padding: 12px;
+  padding: 16px;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  min-height: 400px;
+  width: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* 未提出や総合タブでデータがない場合の表示 */
 .no-chart {
-  width: 300px;
-  height: 300px;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
