@@ -15,8 +15,8 @@
   background: #1e1e2f; /* ダークネイビー */
   padding: 1.5rem;
   border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
+  width: 30%;
+  max-width: 1000px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
   position: relative;
   color: #f0f0f0;
@@ -47,6 +47,7 @@
   margin-bottom: 1rem;
   color: #ddd;
   line-height: 1.6;
+  white-space: pre-wrap;
 }
 
 .modal-footer {

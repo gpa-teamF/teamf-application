@@ -5,6 +5,7 @@ import { SubmitResult } from "../../../models/submitResultResponse";
 interface SubmissionCardProps {
   isSubmitting: boolean;
   isSubmitted: boolean;
+  isTimeUp: boolean;
   onSubmit: () => void;
   submitResult: SubmitResult | null;
 }
@@ -12,6 +13,7 @@ interface SubmissionCardProps {
 const SubmissionResult: React.FC<SubmissionCardProps> = ({
   isSubmitting,
   isSubmitted,
+  isTimeUp,
   onSubmit,
   submitResult,
 }) => {
@@ -56,7 +58,7 @@ const SubmissionResult: React.FC<SubmissionCardProps> = ({
       <h2 className="submission__title">提出</h2>
       <button
         onClick={onSubmit}
-        disabled={isSubmitting || isSubmitted}
+        disabled={isSubmitting || isSubmitted || isTimeUp}
         className="submit-button"
       >
         {isSubmitting ? "提出中..." : "提出"}

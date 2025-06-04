@@ -9,6 +9,7 @@ interface ModalProps {
   showCancelButton?: boolean;
   title?: string;
   children?: ReactNode;
+  width?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -19,6 +20,7 @@ const Modal: React.FC<ModalProps> = ({
   showCancelButton = true,
   title = "",
   children,
+  width,
 }) => {
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -41,7 +43,7 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content" style={{ width: width || "30%" }}>
         <div className="modal-header">
           <h2>{title}</h2>
           <button className="modal-close" onClick={onClose}>

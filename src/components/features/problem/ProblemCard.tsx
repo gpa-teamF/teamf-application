@@ -4,15 +4,42 @@ import { ProblemData } from "../../../models/getProblemsResponse";
 
 interface ProblemCardProps {
   problemData: ProblemData;
+  remainingTime: number; // 秒
+  totalTime: number; // 秒
 }
 
-const ProblemCard: React.FC<ProblemCardProps> = ({ problemData }) => {
+const ProblemCard: React.FC<ProblemCardProps> = ({
+  problemData,
+  remainingTime,
+  totalTime,
+}) => {
+  const percentage = (remainingTime / totalTime) * 100;
+
+  let barColor = "#b039ff";
+  if (remainingTime <= 60) barColor = "#ff9800"; // orange
+  if (remainingTime <= 30) barColor = "#f44336"; // red
+
   return (
     <main className="problem-container">
-      <h1 className="problem-title">{problemData.problemName}</h1>
+      <div className="problem-header">
+        <h1 className="problem-title">{problemData.problemName}</h1>
+        <div className="timer-container">
+          <div className="timer-bar-bg">
+            <div
+              className="timer-bar-fill"
+              style={{
+                width: `${percentage}%`,
+                backgroundColor: barColor,
+              }}
+            ></div>
+          </div>
+          <span className="timer-text">{remainingTime}s</span>
+        </div>
+      </div>
+
       <p>
-        実行時間制限: {problemData.timeLimit} ms / メモリ制限:{" "}
-        {problemData.memoryLimit} KB
+        TLE（実行時間制限）目安: {problemData.timeLimit} ms &nbsp; &nbsp; /
+        &nbsp; &nbsp; MLE（メモリ使用量制限）目安: {problemData.memoryLimit} KB
       </p>
 
       <div className="sub-section">

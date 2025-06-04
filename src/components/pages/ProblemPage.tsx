@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CodeExecutionCard from "../features/problem/CodeExecutionCard";
 import SubmissionCard from "../features/problem/SubmissionCard";
 import Layout from "../layout/Layout";
@@ -34,6 +34,7 @@ const ProblemPage: React.FC = () => {
     | "submitError"
     | "notAllSubmitted"
     | "gotoResultConfirm"
+    | "timeUp"
   >("canNotSubmit");
   const navigate = useNavigate();
 
@@ -57,6 +58,18 @@ const ProblemPage: React.FC = () => {
 
   const { loading: submitLoading, fetchData: fetchSubmission } =
     useApi<SubmitResultResponse>();
+
+  const [submittingLoading, setSubmittingLoading] = useState(false);
+
+  const submissionResultsRef = useRef(submissionResults);
+
+  const isSubmittingMapRef = useRef(isSubmittingMap);
+
+  const isNavigationToResultRef = useRef(false);
+
+  const TIME_UP_MIN = 15;
+  const [isTimeUp, setIsTimeUp] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIME_UP_MIN * 60); // 秒単位でカウントダウン
 
   useEffect(() => {
     const loadProblems = async () => {
@@ -90,6 +103,45 @@ const ProblemPage: React.FC = () => {
 
     loadProblems();
   }, [level, fetchProblem]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isNavigationToResultRef.current) return;
+      setIsTimeUp(true);
+      setModalMode("timeUp");
+      setModalContent("制限時間になりました。最終リザルト画面に遷移します。");
+      setOnModalOk(() => async () => {
+        setIsModalOpen(false);
+        isNavigationToResultRef.current = true;
+        await waitForAllSubmissions();
+      });
+      setIsModalOpen(true);
+    }, TIME_UP_MIN * 60 * 1000);
+
+    return () => clearTimeout(timer); // クリーンアップ
+  }, [navigate, submissionResults]);
+
+  useEffect(() => {
+    submissionResultsRef.current = submissionResults;
+  }, [submissionResults]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    isSubmittingMapRef.current = isSubmittingMap;
+  }, [isSubmittingMap]);
 
   const updateCode = (index: number, code: string) => {
     setProblemStates((prev) => {
@@ -145,6 +197,14 @@ const ProblemPage: React.FC = () => {
   };
 
   const handleSubmit = () => {
+    if (timeLeft <= 0) {
+      setModalMode("canNotSubmit");
+      setModalContent("制限時間が終了しました。提出はできません。");
+      setOnModalOk(() => () => setIsModalOpen(false));
+      setIsModalOpen(true);
+      return;
+    }
+
     const currentProblemId = problems[currentIndex]?.problemId;
     const currentState = problemStates[currentIndex];
 
@@ -162,9 +222,9 @@ const ProblemPage: React.FC = () => {
     // 確認ダイアログを表示
     setModalMode("submitConfirm");
     setModalContent("この問題を提出しますか？提出は一度きりです。");
-    setOnModalOk(() => () => {
+    setOnModalOk(() => async () => {
       setIsModalOpen(false);
-      doSubmit();
+      await doSubmit();
     });
     setIsModalOpen(true);
   };
@@ -194,16 +254,20 @@ const ProblemPage: React.FC = () => {
         setIsSubmittedMap((prev) => ({ ...prev, [currentIndex]: true }));
       } else {
         setModalMode("submitError");
-        setModalContent("提出中にエラーが発生しました。もう一度お試し下さい。");
-        setOnModalOk(() => () => {
+        setModalContent(
+          "提出中にエラーが発生しました。OKを押下して、もう一度お試し下さい。"
+        );
+        setOnModalOk(() => async () => {
           setIsModalOpen(false);
-          doSubmit();
+          await doSubmit();
         });
         setIsModalOpen(true);
       }
     } catch (e) {
       console.error("提出エラー:", e);
-      alert("提出中にエラーが発生しました。もう一度お試しください。");
+      alert(
+        "提出中にエラーが発生しました。お手数をおかけしますがリザルト画面へ進み、フォームにてご連絡下さい。"
+      );
     } finally {
       setIsSubmittingMap((prev) => ({ ...prev, [currentIndex]: false }));
     }
@@ -220,7 +284,9 @@ const ProblemPage: React.FC = () => {
       case "notAllSubmitted":
         return "未提出の問題があります";
       case "gotoResultConfirm":
-        return "リザルト画面へ進む";
+        return "最終リザルトへ進む";
+      case "timeUp":
+        return "時間切れ";
       default:
         return "確認";
     }
@@ -229,6 +295,7 @@ const ProblemPage: React.FC = () => {
   const getModalShowCancelButton = () => {
     switch (modalMode) {
       case "canNotSubmit":
+      case "timeUp":
         return false;
       case "submitConfirm":
       case "submitError":
@@ -239,19 +306,45 @@ const ProblemPage: React.FC = () => {
     }
   };
 
-  const navigateToResult = () => {
-    const hasUnsubmitted = problems.some((_, index) => !isSubmittedMap[index]);
+  const waitForAllSubmissions = async (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        clearInterval(checkInterval);
+        reject(new Error("Timeout while waiting for submissions"));
+      }, 30 * 1000); // 最大30秒まで待つ
 
+      setSubmittingLoading(true);
+      const checkInterval = setInterval(() => {
+        const allDone = problems.every((_, index) => {
+          const isNotSubmitting = !isSubmittingMapRef.current[index];
+          return isNotSubmitting;
+        });
+
+        if (allDone) {
+          setSubmittingLoading(false);
+          clearTimeout(timeout);
+          clearInterval(checkInterval);
+          navigate("/result", {
+            state: { submissionResults: submissionResultsRef.current },
+          });
+          resolve();
+        }
+      }, 100);
+    });
+  };
+
+  const navigateToResult = () => {
+    if (isNavigationToResultRef.current) return;
+    const hasUnsubmitted = problems.some((_, index) => !isSubmittedMap[index]);
     if (hasUnsubmitted) {
       setModalMode("notAllSubmitted");
       setModalContent(
         "未提出の問題があります。本当に最終リザルトへ進みますか？問題ページには戻れません。"
       );
-      setOnModalOk(() => () => {
+      setOnModalOk(() => async () => {
         setIsModalOpen(false);
-        navigate("/result", {
-          state: { submissionResults },
-        });
+        isNavigationToResultRef.current = true;
+        await waitForAllSubmissions();
       });
       setIsModalOpen(true);
     } else {
@@ -259,11 +352,10 @@ const ProblemPage: React.FC = () => {
       setModalContent(
         "本当に最終リザルトへ進みますか？ 問題ページには戻れません。"
       );
-      setOnModalOk(() => () => {
+      setOnModalOk(() => async () => {
         setIsModalOpen(false);
-        navigate("/result", {
-          state: { submissionResults: submissionResults },
-        });
+        isNavigationToResultRef.current = true;
+        await waitForAllSubmissions();
       });
       setIsModalOpen(true);
     }
@@ -278,7 +370,7 @@ const ProblemPage: React.FC = () => {
     <Layout>
       <CenteredCardLayout>
         <OverlayLoading
-          isLoading={problemLoading || executionLoading}
+          isLoading={problemLoading || executionLoading || submittingLoading}
           size={100}
         />
         <div>
@@ -291,7 +383,11 @@ const ProblemPage: React.FC = () => {
                 onClickResult={navigateToResult}
               />
 
-              <ProblemCard problemData={currentProblem} />
+              <ProblemCard
+                problemData={currentProblem}
+                remainingTime={timeLeft}
+                totalTime={TIME_UP_MIN * 60}
+              />
 
               <CodeExecutionCard
                 loading={executionLoading}
@@ -309,6 +405,7 @@ const ProblemPage: React.FC = () => {
               <SubmissionCard
                 isSubmitting={isCurrentSubmitting}
                 isSubmitted={isCurrentSubmitted}
+                isTimeUp={isTimeUp}
                 onSubmit={handleSubmit}
                 submitResult={currentSubmitResult}
               />

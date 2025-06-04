@@ -37,7 +37,7 @@
   font-family: monospace;
 }
 
-.context, 
+.context,
 .example-code {
   /* background-color: #444; */
   background-color: #252525;
@@ -45,4 +45,33 @@
   padding: 0.75rem;
   border-radius: 5px;
   white-space: pre-wrap;
+}
+
+.problem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timer-container {
+  width: 200px;
+  text-align: right;
+}
+
+.timer-bar-bg {
+  background-color: #000000;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.timer-bar-fill {
+  height: 100%;
+  transition: width 1s linear, background-color 0.5s ease;
+}
+
+.timer-text {
+  font-size: 14px;
+  font-weight: bold;
 }
