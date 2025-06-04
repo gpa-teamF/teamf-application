@@ -1,6 +1,5 @@
 import React from "react";
 import "./RuleCard.css";
-import { color } from "@codemirror/theme-one-dark";
 
 interface RuleCardProps {
   onHowToUseClick: () => void;
