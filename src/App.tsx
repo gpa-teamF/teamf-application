@@ -4,12 +4,14 @@ import RemoveTrailingSlash from "./components/common/RemoveTrailingSlash";
 import ProblemPage from "./components/pages/ProblemPage";
 import Welcome from "./components/pages/WelcomePage";
 import DifficultySelectPage from "./components/pages/DifficultySelectPage";
-import ResultPage from "./components/pages/Resultpage";
+import ResultPage from "./components/pages/ResultPage";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 function App() {
   return (
     <BrowserRouter>
       <RemoveTrailingSlash />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Welcome />} />{" "}
         {/* ようこそ画面へのルーティング */}

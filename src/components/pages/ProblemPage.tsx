@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import CodeExecutionCard from "../features/problem/CodeExecutionCard";
 import SubmissionCard from "../features/problem/SubmissionCard";
 import Layout from "../layout/Layout";
@@ -56,8 +56,7 @@ const ProblemPage: React.FC = () => {
   const { loading: executionLoading, fetchData: fetchExecution } =
     useApi<ExecuteCodeResponse>();
 
-  const { loading: submitLoading, fetchData: fetchSubmission } =
-    useApi<SubmitResultResponse>();
+  const { fetchData: fetchSubmission } = useApi<SubmitResultResponse>();
 
   const [submittingLoading, setSubmittingLoading] = useState(false);
 
@@ -69,79 +68,7 @@ const ProblemPage: React.FC = () => {
 
   const TIME_UP_MIN = 15;
   const [isTimeUp, setIsTimeUp] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(TIME_UP_MIN * 60); // 秒単位でカウントダウン
-
-  useEffect(() => {
-    const loadProblems = async () => {
-      if (!level) return;
-      const res = await fetchProblem("/problem", "get", {
-        params: { difficulty: level, count: 3 },
-      });
-      if (res) {
-        setProblems(res);
-        setProblemStates(
-          res.map(() => ({
-            code: "",
-            stdin: "",
-            language: "python",
-            executionResult: undefined,
-          }))
-        );
-
-        const initialMap: Record<number, boolean> = {};
-        const initialResults: Record<number, SubmitResultResponse | null> = {};
-        res.forEach((_, idx) => {
-          initialMap[idx] = false;
-          initialResults[idx] = null;
-        });
-
-        setIsSubmittingMap(initialMap);
-        setIsSubmittedMap(initialMap);
-        setSubmissionResults(initialResults);
-      }
-    };
-
-    loadProblems();
-  }, [level, fetchProblem]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isNavigationToResultRef.current) return;
-      setIsTimeUp(true);
-      setModalMode("timeUp");
-      setModalContent("制限時間になりました。最終リザルト画面に遷移します。");
-      setOnModalOk(() => async () => {
-        setIsModalOpen(false);
-        isNavigationToResultRef.current = true;
-        await waitForAllSubmissions();
-      });
-      setIsModalOpen(true);
-    }, TIME_UP_MIN * 60 * 1000);
-
-    return () => clearTimeout(timer); // クリーンアップ
-  }, [navigate, submissionResults]);
-
-  useEffect(() => {
-    submissionResultsRef.current = submissionResults;
-  }, [submissionResults]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    isSubmittingMapRef.current = isSubmittingMap;
-  }, [isSubmittingMap]);
+  const [timeLeft, setTimeLeft] = useState(TIME_UP_MIN * 60);
 
   const updateCode = (index: number, code: string) => {
     setProblemStates((prev) => {
@@ -306,12 +233,12 @@ const ProblemPage: React.FC = () => {
     }
   };
 
-  const waitForAllSubmissions = async (): Promise<void> => {
+  const waitForAllSubmissions = useCallback(async (): Promise<void> => {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         clearInterval(checkInterval);
         reject(new Error("Timeout while waiting for submissions"));
-      }, 30 * 1000); // 最大30秒まで待つ
+      }, 30 * 1000);
 
       setSubmittingLoading(true);
       const checkInterval = setInterval(() => {
@@ -331,7 +258,7 @@ const ProblemPage: React.FC = () => {
         }
       }, 100);
     });
-  };
+  }, [problems, navigate]);
 
   const navigateToResult = () => {
     if (isNavigationToResultRef.current) return;
@@ -360,6 +287,78 @@ const ProblemPage: React.FC = () => {
       setIsModalOpen(true);
     }
   };
+
+  useEffect(() => {
+    const loadProblems = async () => {
+      if (!level) return;
+      const res = await fetchProblem("/problem", "get", {
+        params: { difficulty: level, count: 3 },
+      });
+      if (res) {
+        setProblems(res);
+        setProblemStates(
+          res.map(() => ({
+            code: "",
+            stdin: "",
+            language: "python",
+            executionResult: undefined,
+          }))
+        );
+
+        const initialMap: Record<number, boolean> = {};
+        const initialResults: Record<number, SubmitResultResponse | null> = {};
+        res.forEach((_, idx) => {
+          initialMap[idx] = false;
+          initialResults[idx] = null;
+        });
+
+        setIsSubmittingMap(initialMap);
+        setIsSubmittedMap(initialMap);
+        setSubmissionResults(initialResults);
+      }
+    };
+
+    loadProblems();
+  }, [level, fetchProblem]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isNavigationToResultRef.current) return;
+      setIsTimeUp(true);
+      setModalMode("timeUp");
+      setModalContent("制限時間になりました。最終リザルト画面に遷移します。");
+      setOnModalOk(() => async () => {
+        setIsModalOpen(false);
+        isNavigationToResultRef.current = true;
+        await waitForAllSubmissions();
+      });
+      setIsModalOpen(true);
+    }, TIME_UP_MIN * 60 * 1000);
+
+    return () => clearTimeout(timer);
+  }, [waitForAllSubmissions]);
+
+  useEffect(() => {
+    submissionResultsRef.current = submissionResults;
+  }, [submissionResults]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    isSubmittingMapRef.current = isSubmittingMap;
+  }, [isSubmittingMap]);
 
   const currentProblem = problems[currentIndex];
   const currentSubmitResult = submissionResults[currentIndex] || null;

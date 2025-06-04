@@ -14,6 +14,7 @@ import Modal from "../common/Modal";
 import Layout from "../layout/Layout";
 import CenteredCardLayout from "../layout/CenteredCardLayout";
 import OverlayLoading from "../common/OverlayLoading";
+import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
 // Location.state の型定義
 interface LocationState {
@@ -34,16 +35,9 @@ const ResultPage: React.FC = () => {
     }
   }, [state, navigate]);
 
-  if (!state || !state.submissionResults) {
-    return null;
-  }
-
   // submissionResults は Record<number, SubmitResult | null> なので、
   // 問題番号のインデックス（0,1,2, ...）に対応する型
   const submissionResultsObj = state.submissionResults;
-
-  // 問題数を取得（Object.keys→ string[] なので length で数えて number に変換）
-  const problemCount = Object.keys(submissionResultsObj).length;
 
   // navigation で参照するためにキーを配列化
   const problemIndices = Object.keys(submissionResultsObj)
@@ -61,9 +55,6 @@ const ResultPage: React.FC = () => {
   const [modalTitle, setModalTitle] = useState("");
   const [modalContent, setModalContent] = useState<React.ReactNode>("");
   const [onModalOk, setOnModalOk] = useState<() => void>(() => {});
-
-  // 評価基準ダイアログ制御用
-  const [isCriteriaModalOpen, setIsCriteriaModalOpen] = useState(false);
 
   // ----- レーダーチャート表示用データ作成 -----
 
@@ -180,11 +171,6 @@ const ResultPage: React.FC = () => {
 
   const { label: rankLabel, color: rankColor } = getRank(totalScore);
 
-  // ⑤：テストケース結果を配列化
-  const testResultsForTable: SubmitResult["testResults"] = selectedResult
-    ? selectedResult.testResults
-    : [];
-
   // ----- ハンドラ類 -----
 
   // 「評価基準を確認」ボタン押下時
@@ -204,9 +190,7 @@ const ResultPage: React.FC = () => {
     );
     setOnModalOk(() => () => {
       setIsModalOpen(false);
-      setIsCriteriaModalOpen(false);
     });
-    setIsCriteriaModalOpen(true);
     setIsModalOpen(true);
   };
 
@@ -318,10 +302,16 @@ const ResultPage: React.FC = () => {
                     fillOpacity={0.6}
                   />
                   <Tooltip
-                    formatter={(value: any, name: string, props: any) => {
-                      // name は "スコア" になるので、代わりに metric を表示する
-                      const metric = props.payload.metric;
-                      return [`${value}`, metric];
+                    formatter={(
+                      value: number | string,
+                      _name: string,
+                      item?: Payload<string | number, string> // 省略可能にする
+                    ) => {
+                      // payload が存在するか安全にチェック
+                      const metric =
+                        item?.payload &&
+                        (item.payload as { metric?: string }).metric;
+                      return [`${value}`, metric ?? ""]; // metric がなければ空文字
                     }}
                   />
                 </RadarChart>
@@ -373,7 +363,7 @@ const ResultPage: React.FC = () => {
             <p>
               ご使用いただきありがとうございました。最後に
               <a
-                href="https://example.com/survey"
+                href="https://forms.office.com/r/WnETkdq087?origin=lprLink"
                 target="_blank"
                 rel="noopener noreferrer"
               >

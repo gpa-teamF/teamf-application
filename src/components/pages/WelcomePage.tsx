@@ -62,7 +62,7 @@ const Welcome: React.FC = () => {
               ご意見・不具合のご報告については、以下のフォームより詳細をご連絡いただけますと幸いです。
               <br />{" "}
               <a
-                href="https://forms.office.com/your-form-link"
+                href="https://forms.office.com/r/ft1xYq38a6?origin=lprLink"
                 target="_blank"
                 rel="noopener noreferrer"
               >

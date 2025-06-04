@@ -1,9 +1,10 @@
 import React from "react";
 import "./ProblemNavigationCard.css";
+import { ProblemData } from "../../../models/getProblemsResponse";
 
 interface Props {
   currentIndex: number;
-  problems: any[];
+  problems: ProblemData[];
   onSelectProblem: (index: number) => void;
   onClickResult: () => void;
 }
