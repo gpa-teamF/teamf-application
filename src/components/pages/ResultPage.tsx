@@ -24,6 +24,7 @@ interface LocationState {
 const ResultPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [modalWidth, setModalWidth] = useState("");
 
   // 1) 受け取った state を型アサーションで取得
   const state = (location.state as LocationState) || null;
@@ -175,15 +176,36 @@ const ResultPage: React.FC = () => {
 
   // 「評価基準を確認」ボタン押下時
   const openCriteriaModal = () => {
-    setModalTitle("評価基準");
+    setModalTitle("評価について");
+    setModalWidth("40%");
     setModalContent(
       <>
         <ul>
-          <li>正確性 : テストケースの通過率に応じて点数を付与</li>
-          <li>パフォーマンス : 実行時間の速さに応じて点数を付与</li>
-          <li>アルゴリズム : 計算量・適切さを評価</li>
-          <li>コード品質 : コメントや命名規則・構造の良さを評価</li>
-          <li>可読性 : 可読性・一貫性・可維持性を評価</li>
+          <h2>ランク判定 (得点率を元に判定)</h2>
+          <li>S：9割以上</li>
+          <li>A：8割以上</li>
+          <li>B：7割以上</li>
+          <li>C：6割以上</li>
+          <li>D：5割以上</li>
+          <li>E：5割未満</li>
+          <h2>評価基準</h2>
+          <li>正確性 ：テストケースの通過率に応じて点数を付与。</li>
+          <li>
+            パフォーマンス ：
+            基準値を元に実行時間とメモリ使用量から評価。小規模なテストケースほど厳しく評価。
+          </li>
+          <li>
+            アルゴリズム ：
+            基準値を元に実行時間とメモリ使用量から評価。対象は大規模テストケース限定。
+          </li>
+          <li>
+            コード品質 ： Linterを用いて評価。関数 / docstring /
+            エントリポイント / ネストの深さなどが評価に影響。
+          </li>
+          <li>
+            可読性 ：
+            フォーマッタを用いて評価。元のソースコードとフォーマット後を比較して差分が多いと減点。
+          </li>
         </ul>
       </>
     );
@@ -264,7 +286,7 @@ const ResultPage: React.FC = () => {
 
               {/* 評価基準確認ボタン */}
               <button className="criteria-button" onClick={openCriteriaModal}>
-                評価基準を確認
+                評価について確認
               </button>
             </div>
 
@@ -386,6 +408,7 @@ const ResultPage: React.FC = () => {
             onOk={onModalOk}
             showCancelButton={false}
             title={modalTitle}
+            width={modalWidth}
           >
             {modalContent}
           </Modal>

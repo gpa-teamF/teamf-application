@@ -108,8 +108,8 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
               disabled={isSubmitted}
             >
               <option value="python">Python (Python 3.12)</option>
-              <option value="java">Java (Amazon Corretto 17)</option>
-              <option value="cpp">C++17 (GCC 11)</option>
+              {/* <option value="java">Java (Amazon Corretto 17)</option>
+              <option value="cpp">C++17 (GCC 11)</option> */}
             </select>
           </div>
 
