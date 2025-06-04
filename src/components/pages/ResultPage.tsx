@@ -16,6 +16,14 @@ import CenteredCardLayout from "../layout/CenteredCardLayout";
 import OverlayLoading from "../common/OverlayLoading";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
+const MAX_SCORES = {
+  correctnessScore: 30,
+  performanceScore: 25,
+  algorithmsScore: 25,
+  codeQualityScore: 10,
+  readabilityScore: 10,
+};
+
 // Location.state の型定義
 interface LocationState {
   submissionResults: Record<number, SubmitResult | null>;
@@ -128,27 +136,41 @@ const ResultPage: React.FC = () => {
     ? [
         {
           metric: "正確性",
-          score: selectedResult.evaluateResult.correctnessScore,
+          score:
+            (selectedResult.evaluateResult.correctnessScore /
+              MAX_SCORES.correctnessScore) *
+            100,
         },
         {
           metric: "パフォーマンス",
-          score: selectedResult.evaluateResult.performanceScore,
+          score:
+            (selectedResult.evaluateResult.performanceScore /
+              MAX_SCORES.performanceScore) *
+            100,
         },
         {
           metric: "アルゴリズム",
-          score: selectedResult.evaluateResult.algorithmsScore,
+          score:
+            (selectedResult.evaluateResult.algorithmsScore /
+              MAX_SCORES.algorithmsScore) *
+            100,
         },
         {
           metric: "コード品質",
-          score: selectedResult.evaluateResult.codeQualityScore,
+          score:
+            (selectedResult.evaluateResult.codeQualityScore /
+              MAX_SCORES.codeQualityScore) *
+            100,
         },
         {
           metric: "可読性",
-          score: selectedResult.evaluateResult.readabilityScore,
+          score:
+            (selectedResult.evaluateResult.readabilityScore /
+              MAX_SCORES.readabilityScore) *
+            100,
         },
       ]
     : [];
-
   // ③：総合スコア & ランクを算出
   //    個別タブなら totalScore、総合タブなら合算 totalScore を使用
   const computeTotalScore = (): number => {
@@ -326,13 +348,12 @@ const ResultPage: React.FC = () => {
                     formatter={(
                       value: number | string,
                       _name: string,
-                      item?: Payload<string | number, string> // 省略可能にする
+                      item?: Payload<string | number, string>
                     ) => {
-                      // payload が存在するか安全にチェック
                       const metric =
                         item?.payload &&
                         (item.payload as { metric?: string }).metric;
-                      return [`${value}`, metric ?? ""]; // metric がなければ空文字
+                      return [`${value}%`, metric ?? ""];
                     }}
                   />
                 </RadarChart>
