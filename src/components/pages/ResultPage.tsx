@@ -363,7 +363,7 @@ const ResultPage: React.FC = () => {
             <p>
               ご使用いただきありがとうございました。最後に
               <a
-                href="https://forms.office.com/r/WnETkdq087?origin=lprLink"
+                href="https://forms.office.com/Pages/ResponsePage.aspx?id=HRKfoeGBWEip2HNuJn_UxzQ2_zJ34E1OmUMds1xWoUtUMEtBWkFMU0hBT1ZLRVNDWjhFR002R1JPQi4u"
                 target="_blank"
                 rel="noopener noreferrer"
               >
