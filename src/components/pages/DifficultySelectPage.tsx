@@ -32,12 +32,14 @@ const DifficultySelectPage: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState("easy");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState("");
+  const [modalShowCancel, setModalShowCancel] = useState(false);
   const [modalWidth, setModalWidth] = useState("");
   const [onModalOk, setOnModalOk] = useState<() => void>(() => {});
   const navigate = useNavigate();
 
   const handleStartClick = () => {
     setModalWidth("30%");
+    setModalShowCancel(true);
     setModalContent(
       `レベル「${
         difficulties.find((d) => d.level === selectedLevel)?.name
@@ -52,6 +54,7 @@ const DifficultySelectPage: React.FC = () => {
 
   const handleHowToUseClick = () => {
     setModalWidth("180%");
+    setModalShowCancel(false);
     setModalContent(
       "【利用方法】\n・[タイマー]：問題名の横に残り時間が表示されます。\n・[問題]：問題文や制約、入出力例などが表示されます。問題は上部のボタンで自由に切り替えられます。\n・[コード実行]：言語/ソースコード/標準入力を自由に選択/入力できます。\n・[実行]ボタン：ソースコードを入力してボタン押下するとその実行結果が表示されます。何度でも実行することができます。（不必要な実行はお控えください。）\n・[提出ボタン]：押下するとテストケースの結果とソースコードの評価が表示されます。問題ごとに1回のみ提出することができます。\n・[最終リザルトへ]ボタン：問題回答を終了し、リザルト画面を表示します。未提出の問題があってもリザルトへ進めますが、問題画面には戻れません。\n\n【判定結果】\n・[AC]：正解 / [WA]：不正解 / [TLE]：正解かつ実行時間制限超過 / [OLE]：正解かつメモリ使用量制限超過 / [RE]：実行時エラー / [CE]：コンパイルエラー\n\n【ソースコードの評価】\n・[正確性]：正答率を元に評価します。（正解したテストケースが対象）\n・[パフォーマンス]：基準値を元に実行時間とメモリ使用量から評価します。小規模なテストケースほど厳しく評価します。（全てのテストケースが対象）\n・[アルゴリズム]：基準値を元に実行時間とメモリ使用量から評価します。（正解した大規模テストケースが対象）\n・[コード品質]：Linterを用いて評価します。関数の有無、docstringの有無、エントリポイントの有無、ネストの深さ等が評価に影響します。\n・[可読性]：フォーマッタを用いて評価します。元のソースコードとフォーマット後を比較して差分が多いと減点されます。"
     );
@@ -86,6 +89,7 @@ const DifficultySelectPage: React.FC = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          showCancelButton={modalShowCancel}
           onOk={onModalOk}
           title="確認"
           width={modalWidth}
