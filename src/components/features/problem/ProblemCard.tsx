@@ -37,10 +37,7 @@ const ProblemCard: React.FC<ProblemCardProps> = ({
         </div>
       </div>
 
-      <p>
-        TLE（実行時間制限）目安: {problemData.timeLimit} ms &nbsp; &nbsp; /
-        &nbsp; &nbsp; MLE（メモリ使用量制限）目安: {problemData.memoryLimit} KB
-      </p>
+      <p>TLE（実行時間制限）目安: {problemData.timeLimit} ms &nbsp; &nbsp;</p>
 
       <div className="sub-section">
         <h2 className="problem-subtitle">問題文</h2>

@@ -4,7 +4,6 @@ export interface ExecuteResult {
   exitCode: number;
   status: string;
   executionTimeMs: number;
-  memoryUsageKb: number;
   error: string;
 }
 

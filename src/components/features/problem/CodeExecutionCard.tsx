@@ -67,7 +67,6 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
       case "OK":
         return "status-ok";
       case "TLE":
-      case "MLE":
         return "status-warning";
       case "CE":
       case "RE":
@@ -83,8 +82,6 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
         return "OK (正常終了)";
       case "TLE":
         return "TLE (制限時間超過)";
-      case "MLE":
-        return "MLE (メモリ使用量超過)";
       case "CE":
         return "CE (コンパイルエラー)";
       case "RE":
@@ -185,14 +182,6 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
                     : "-"}
                 </td>
               </tr>
-              <tr>
-                <th>メモリ使用量 (KB)</th>
-                <td>
-                  {currentState.executionResult?.memoryUsageKb != null
-                    ? `${currentState.executionResult.memoryUsageKb} KB`
-                    : "-"}
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -216,34 +205,6 @@ const CodeExecutionCard: React.FC<CodeExecutionCardProps> = ({
           />
         </div>
       </section>
-
-      {currentState.submitResult && (
-        <section>
-          <h2 className="code-execution__title">提出結果</h2>
-          <div className="sub-section">
-            <table className="result-table">
-              <tbody>
-                <tr>
-                  <th>合計スコア</th>
-                  <td>{currentState.submitResult.evaluateResult.totalScore}</td>
-                </tr>
-                <tr>
-                  <th>正答率</th>
-                  <td>
-                    {currentState.submitResult.evaluateResult.correctnessScore}
-                  </td>
-                </tr>
-                <tr>
-                  <th>パフォーマンス</th>
-                  <td>
-                    {currentState.submitResult.evaluateResult.performanceScore}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
     </main>
   );
 };

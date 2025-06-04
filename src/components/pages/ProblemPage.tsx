@@ -107,7 +107,6 @@ const ProblemPage: React.FC = () => {
         stdin,
         language: problemStates[problemIndex].language,
         timeLimit: problems[problemIndex].timeLimit,
-        memoryLimit: problems[problemIndex].memoryLimit,
       },
     });
 

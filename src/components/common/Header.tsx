@@ -7,7 +7,7 @@ const Header: React.FC = () => {
     <header className="header">
       <Link to="/">
         <div className="header-container">
-          <img src="src/assets/logo.png" alt="Logo" className="logo-img" />
+          <img src="/logo.svg" alt="Logo" className="logo-img" />
           <h1 className="apl-ttl">競プロくん</h1>
         </div>
       </Link>

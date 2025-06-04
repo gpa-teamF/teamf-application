@@ -1,8 +1,7 @@
 export interface TestResult {
   testcaseId: number;
-  status: "AC" | "WA" | "TLE" | "MLE" | "CE" | "RE";
+  status: "AC" | "WA" | "TLE" | "CE" | "RE";
   executionTime: number; // ms
-  memoryUsage: number;   // KB
 }
 
 export interface EvaluateResult {

@@ -24,7 +24,6 @@ const SubmissionResult: React.FC<SubmissionCardProps> = ({
       case "WA":
         return "status-wa";
       case "TLE":
-      case "MLE":
         return "status-warning";
       case "CE":
       case "RE":
@@ -42,8 +41,6 @@ const SubmissionResult: React.FC<SubmissionCardProps> = ({
         return "WA (不正解)";
       case "TLE":
         return "TLE (制限時間超過)";
-      case "MLE":
-        return "MLE (メモリ使用量超過)";
       case "CE":
         return "CE (コンパイルエラー)";
       case "RE":
@@ -74,7 +71,6 @@ const SubmissionResult: React.FC<SubmissionCardProps> = ({
                   <th>No.</th>
                   <th>ステータス</th>
                   <th>実行時間 (ms)</th>
-                  <th>メモリ使用量 (KB)</th>
                 </tr>
               </thead>
               <tbody>
@@ -95,7 +91,6 @@ const SubmissionResult: React.FC<SubmissionCardProps> = ({
                       )}
                     </td>
                     <td>{item.executionTime}</td>
-                    <td>{item.memoryUsage}</td>
                   </tr>
                 ))}
               </tbody>

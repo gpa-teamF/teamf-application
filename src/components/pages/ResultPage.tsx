@@ -192,11 +192,11 @@ const ResultPage: React.FC = () => {
           <li>正確性 ：テストケースの通過率に応じて点数を付与。</li>
           <li>
             パフォーマンス ：
-            基準値を元に実行時間とメモリ使用量から評価。小規模なテストケースほど厳しく評価。
+            基準値を元に実行時間から評価。小規模なテストケースほど厳しく評価。
           </li>
           <li>
             アルゴリズム ：
-            基準値を元に実行時間とメモリ使用量から評価。対象は大規模テストケース限定。
+            基準値を元に実行時間から評価。対象は大規模テストケース限定。
           </li>
           <li>
             コード品質 ： Linterを用いて評価。関数 / docstring /
@@ -297,7 +297,7 @@ const ResultPage: React.FC = () => {
                   cx="50%"
                   cy="50%"
                   outerRadius="80%"
-                  width={400}
+                  width={500}
                   height={400}
                   data={chartData}
                 >
@@ -353,7 +353,6 @@ const ResultPage: React.FC = () => {
                   <th className="sticky-col-left">ID</th>
                   <th>結果</th>
                   <th>実行時間 (ms)</th>
-                  <th>メモリ (KB)</th>
                   <th className="sticky-col-right">備考</th>
                 </tr>
               </thead>
@@ -364,7 +363,6 @@ const ResultPage: React.FC = () => {
                       <td className="sticky-col-left">{res.testcaseId}</td>
                       <td>{res.status}</td>
                       <td>{res.executionTime}</td>
-                      <td>{res.memoryUsage}</td>
                       <td className="sticky-col-right">
                         {res.status !== "AC" ? "要修正" : "OK"}
                       </td>
